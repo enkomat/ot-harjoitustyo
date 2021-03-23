@@ -1,6 +1,6 @@
-#Ohjelmistotekniikan harjoitustyö 2021
-##Matias Enkovaara
+# Ohjelmistotekniikan harjoitustyö 2021
+## Matias Enkovaara
 
-*Ensimmäisen viikon tehtävät löytyvät Viikko1 hakemistosta.
-  *gitlog.txt
-  *komentorivi.txt
+* Ensimmäisen viikon tehtävät löytyvät [viikko1](https://github.com/enkomat/ot-harjoitustyo/tree/master/laskarit/viikko1) hakemistosta
+  * [gitlog.txt](https://github.com/enkomat/ot-harjoitustyo/blob/master/laskarit/viikko1/gitlog.txt)
+  * [komentorivi.txt](https://github.com/enkomat/ot-harjoitustyo/blob/master/laskarit/viikko1/komentorivi.txt)
