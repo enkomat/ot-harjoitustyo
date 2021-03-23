@@ -1,0 +1,113 @@
+mazi@names-MacBook-Pro tiedostoja % git log --stat | cat
+commit c5c0921b3585ce5894dcfa700e65e0a5f8a926d2
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:58:57 2021 +0200
+
+    .
+
+ tiedostoja/file22.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 065e6a58c1899de4250286ef1381b2cb27e98aaa
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:58:37 2021 +0200
+
+    --
+
+ tiedostoja/file1.txt | 0
+ tiedostoja/file2.txt | 0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+
+commit d16f2d21efca771fc0de0f302eaa65f2d0c3322c
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:55:30 2021 +0200
+
+    filuja
+
+ tiedostoja/file1.txt | 0
+ tiedostoja/file2.txt | 0
+ tiedostoja/file3.txt | 0
+ 3 files changed, 0 insertions(+), 0 deletions(-)
+
+commit c4cc3256d9cd9fe32569f4f9aff10a36c71d1c0d
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:50:44 2021 +0200
+
+    uusi
+
+ eka.txt    | 2 +-
+ kolmas.txt | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+commit 286918cf955f41e6d565e7c6c5bea64afe2c04e3
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:49:25 2021 +0200
+
+    nimenmuutos
+
+ tiedosto.txt => eka.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 81d1a27f2f9bd7cc7ac8ae822aaae554f5a7bb01
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:48:38 2021 +0200
+
+    tiedosto poistettu
+
+ toinen.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit b606a473a071d095201274c6524535bb5c3bfc11
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:43:26 2021 +0200
+
+    muutos 2
+
+ tiedosto.txt | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+commit dedda92817c8af312a44f532b61fc7ff7f2e6344
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:42:34 2021 +0200
+
+    muutos
+
+ tiedosto.txt | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+commit 6009f160e677f1dc8a0bdf8e2bbc470bba223620
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:38:52 2021 +0200
+
+    uusi hakemisto
+
+ stuff/stuff.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit d9ef0cdf2acc33ff4700a622be206fdcfdfee22c
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:37:30 2021 +0200
+
+    uusi tiedosto
+
+ kolmas.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 11f11f68a3af5f1895e735e401ff04a8be3eef0e
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:34:37 2021 +0200
+
+    muutos ja lisäys
+
+ tiedosto.txt | 1 +
+ toinen.txt   | 0
+ 2 files changed, 1 insertion(+)
+
+commit 8a9291117e86cec3dd4211386a944df71b609621
+Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
+Date:   Fri Mar 19 16:31:34 2021 +0200
+
+    tiedosto.txt luotu
+
+ tiedosto.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
