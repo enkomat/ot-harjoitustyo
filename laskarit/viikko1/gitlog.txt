@@ -1,3 +1,4 @@
+epäsynkrooni
 mazi@names-MacBook-Pro tiedostoja % git log --stat | cat
 commit c5c0921b3585ce5894dcfa700e65e0a5f8a926d2
 Author: Matias Enkovaara <matias.enkovaara@helsinki.fi>
