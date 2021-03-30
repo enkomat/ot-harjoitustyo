@@ -37,31 +37,34 @@ class TestKassapaate(unittest.TestCase):
     
     def test_korttiosto_toimii_edulliset(self):
         testikortti_albert = Maksukortti(1000)
-        self.kassapaate.syo_edullisesti_kortilla(testikortti_albert)
+        self.assertEqual(self.kassapaate.syo_edullisesti_kortilla(testikortti_albert), True)
         self.assertEqual(str(testikortti_albert), "saldo: 7.6")
         self.assertEqual(self.kassapaate.edulliset, 1)
         self.assertEqual(self.kassapaate.kassassa_rahaa, 100000)
         testikortti_berta = Maksukortti(10)
-        self.kassapaate.syo_edullisesti_kortilla(testikortti_berta)
+        self.assertEqual(self.kassapaate.syo_edullisesti_kortilla(testikortti_berta), False)
         self.assertEqual(str(testikortti_berta), "saldo: 0.1")
         self.assertEqual(self.kassapaate.edulliset, 1)
         self.assertEqual(self.kassapaate.kassassa_rahaa, 100000)
     
     def test_korttiosto_toimii_maukkaat(self):
         testikortti_albert = Maksukortti(1000)
-        self.kassapaate.syo_maukkaasti_kortilla(testikortti_albert)
+        self.assertEqual(self.kassapaate.syo_maukkaasti_kortilla(testikortti_albert), True);
         self.assertEqual(str(testikortti_albert), "saldo: 6.0")
         self.assertEqual(self.kassapaate.maukkaat, 1)
         self.assertEqual(self.kassapaate.kassassa_rahaa, 100000)
         testikortti_berta = Maksukortti(10)
-        self.kassapaate.syo_maukkaasti_kortilla(testikortti_berta)
+        self.assertEqual(self.kassapaate.syo_maukkaasti_kortilla(testikortti_berta), False);
         self.assertEqual(str(testikortti_berta), "saldo: 0.1")
-        self.assertEqual(self.kassapaate.maukkaat, 1)
+        self.assertEqual(self.kassapaate.maukkaat,1)
         self.assertEqual(self.kassapaate.kassassa_rahaa, 100000)
+        
     
     def test_saldo_kasvaa_kortille_rahaa_lisattaessa(self):
         testikortti_albert = Maksukortti(1000)
         self.kassapaate.lataa_rahaa_kortille(testikortti_albert, 450)
         self.assertEqual(str(testikortti_albert), "saldo: 14.5")
         self.assertEqual(self.kassapaate.kassassa_rahaa, 100450)
-    
+        self.kassapaate.lataa_rahaa_kortille(testikortti_albert, -450)
+        self.assertEqual(str(testikortti_albert), "saldo: 14.5")
+        self.assertEqual(self.kassapaate.kassassa_rahaa, 100450)
