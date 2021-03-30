@@ -127,6 +127,8 @@ Sovelluksella on vain yksi käyttäjä, joka on sitä koodissaan käyttävä ohj
 
 ## Käyttöliittymäluonnos
 
+![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/UI.jpeg)
+
 ## Perusversion tarjoama toiminnallisuus
 
 * Neljä metodikutsua: node(), link(), box(), table(). 
