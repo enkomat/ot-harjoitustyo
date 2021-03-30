@@ -16,7 +16,7 @@ Sovelluksella on vain yksi käyttäjä, joka on sitä koodissaan käyttävä ohj
 
 ## Käyttöliittymäluonnos
 
-![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level2.png)
+![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level1.png)
 
 ## Perusversion tarjoama toiminnallisuus
 
