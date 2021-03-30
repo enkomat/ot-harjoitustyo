@@ -2,7 +2,7 @@
 
 ## Sovelluksen tarkoitus
 
-Sovellus on peli nimeltä Spaghetti Master. Pelin ydinidea on puzzlepeli jota voi kontrolloida pelkästään kutsuilla koodista. Tarkoitus on lähtökohtaisesti viihdyttää ja mahdollisesti opettaa jotain uutta ohjelmoinnista samalla. Peli ei todennäköisesti sovellu kenellekkään, jolla ei aikaisempaa koodauskokemusta. Eli ideana on tehdä ongelmista kohtuu kinkkisiä.
+Sovellus on peli nimeltä Legend of Spaghetti Master. Pelin ydinidea on puzzlepeli jota voi kontrolloida pelkästään kutsuilla koodista. Tarkoitus on lähtökohtaisesti viihdyttää ja mahdollisesti opettaa jotain uutta ohjelmoinnista samalla. Peli ei todennäköisesti sovellu kenellekkään, jolla ei aikaisempaa koodauskokemusta. Eli ideana on tehdä ongelmista kohtuu kinkkisiä.
 
 ## Pelin toiminta
 
@@ -12,7 +12,7 @@ Käytän [tätä](https://www.kenney.nl/assets/micro-roguelike) public domain gr
 
 ## Käyttäjät
 
-Sovelluksella on vain yksi käyttäjä, joka on sitä koodissaan käyttävä ohjelmoija.
+Pelillä on vain yksi käyttäjä, eli pelaaja.
 
 ## Käyttöliittymäluonnos
 
