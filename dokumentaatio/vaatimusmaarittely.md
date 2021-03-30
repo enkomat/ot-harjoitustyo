@@ -31,6 +31,7 @@ Tämän jälkeen käyttäjä näkee algoritminsa toiminnan reaaliajassa ja voi k
 Tämä alkuperäinen DFS koodi on [GeeksforGeeks](https://www.geeksforgeeks.org/iterative-depth-first-traversal/) sivustolta, mutta olen lisännyt siihen neljään kohtaan kutsun sovellukseeni. Node metodin parametrit ovat seuraavat: Node, name, color, size, position. Metodi on ylikuormitettu niin, että siitä voi käyttää mitä tahansa variaatioita. Lyhyin mahdollinen kutsu sisältää pelkän referenssin haluttuun solmuun. Link metodin parametrit ovat taas seuraavat: node1, node2, name, color, width. Lyhyin metodikutsu on vain yksinkertainen kahden solmun linkitys.
 
 Oletetaan, että meillä olisi seuraavanlainen simppeli verkko kyseessä:
+    
     A : [B,C,E]
     B : [A,C]
     C : [A,B]
