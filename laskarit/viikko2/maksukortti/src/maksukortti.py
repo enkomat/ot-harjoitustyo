@@ -1,7 +1,6 @@
 EDULLINEN = 2.5
 MAUKAS = 4
 
-
 class Maksukortti:
     def __init__(self, arvo_alussa):
         self.arvo = arvo_alussa
