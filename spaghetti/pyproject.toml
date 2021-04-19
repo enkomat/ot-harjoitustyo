@@ -5,13 +5,14 @@ description = ""
 authors = ["Matias Enkovaara <matias.enkovaara@helsinki.fi>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.6.9"
 pytest = "^6.2.3"
 pygame = "^2.0.1"
 invoke = "^1.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
+coverage = "^5.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

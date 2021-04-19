@@ -10,7 +10,13 @@ from util import Level_1
 # Level_1.player_interact()
 # -------------------------------------
 
+for i in range(29):
+    Level_1.move_player_down()
 
+for i in range(29):
+    Level_1.move_player_right()
+
+Level_1.player_interact()
 
 # -------------------------------------
 
