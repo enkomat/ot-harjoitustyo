@@ -37,7 +37,7 @@ Koodia voi myös toki tarkastella ja editoida suoraan komentoriviltä Nanon avul
 nano src/level_1.py
 ```
 
-Pelissä on tällä hetkellä kolme tasoa, joiden kaikkien pitäisi toimia. Kun taso on suoritettu, ilmestyy peliruudulle "level solved" teksti.
+Pelissä on tällä hetkellä neljä tasoa, joiden kaikkien pitäisi toimia. Kun taso on suoritettu, ilmestyy peliruudulle "level solved" teksti.
 
 Toisen tason voi avata seuraavilla komennoilla:
 
@@ -58,6 +58,8 @@ poetry run invoke level3
 ```bash
 open src/level_3.py
 ```
+
+Neljännen samalla kaavalla.
 
 ### Testaus
 
