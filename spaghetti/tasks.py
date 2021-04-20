@@ -16,6 +16,10 @@ def level2(ctx):
     ctx.run("python3 src/level_2.py")
 
 @task
+def level3(ctx):
+    ctx.run("python3 src/level_3.py")
+
+@task
 def test(ctx):
     ctx.run("pytest src")
 
