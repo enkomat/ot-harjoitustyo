@@ -6,9 +6,7 @@ Pelin ensimmäistä tasoa voi pelata muokkaamalla 'level_1.py" tiedoston koodia.
 
 ## Dokumentaatio
 
-- [Käyttöohje](./dokumentaatio/kayttoohje.md)
 - [Vaatimusmäärittely](./dokumentaatio/vaatimusmaarittely.md)
-- [Arkkitehtuurikuvaus](./dokumentaatio/arkkitehtuuri.md)
 - [Työaikakirjanpito](./dokumentaatio/tyoaikakirjanpito.md)
 
 ## Komentorivitoiminnot
