@@ -17,8 +17,7 @@ map_tiles = [pygame.image.load(
     cwd + "/spaghetti/src/assets/colored_tilemap_packed_140.bmp")] * 1024
 background_color = (0, 0, 0)  # change from black to more grey
 
-image_tiles = [pygame.image.load(
-    cwd + "/spaghetti/src/assets/colored_tilemap_packed_140.bmp")] * 256
+image_tiles = []
 
 event_list = []
 event_parameter_list = []
@@ -28,12 +27,12 @@ fps = 60
 class Util:
     def load_tile_images():
         i = 0
-        for filename in os.listdir(cwd + "/spaghetti/src/assets/"):
+        for filename in sorted(os.listdir(cwd + "/spaghetti/src/assets/")):
             path = cwd + "/spaghetti/src/assets/" + filename
             if 'bmp' in path:
-                image_tiles[i] = pygame.image.load(path)
-                image_tiles[i].convert()
-                i += 1
+                new_bmp = pygame.image.load(path)
+                new_bmp.convert()
+                image_tiles.append(new_bmp)
 
     def draw_text(text, x, y):
         text_surface = font.render(text, False, (255, 255, 255))
@@ -59,13 +58,13 @@ class Util:
         x *= tile_pixel_size
         y *= tile_pixel_size
         y += 64
-        window.blit(image_tiles[140], (x, y))
+        window.blit(image_tiles[6], (x, y))
 
     def draw_goal(x, y):
         x *= tile_pixel_size
         y *= tile_pixel_size
         y += 64
-        window.blit(image_tiles[50], (x, y))
+        window.blit(image_tiles[32], (x, y))
 
     def add_to_event_list(method_to_add):
         event_list.append(method_to_add)
@@ -126,7 +125,7 @@ class Util_Level_1:
         x = 0
         y = 64
         for tile in map_tiles:
-            window.blit(image_tiles[141], (x, y))
+            window.blit(image_tiles[15], (x, y))
             x += tile_pixel_size
             if x >= width:
                 x = 0
