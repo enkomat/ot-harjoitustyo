@@ -276,7 +276,7 @@ class Util_Level_2:
         x = 0
         y = 64
         for tile in map_tiles:
-            window.blit(image_tiles[141], (x, y))
+            window.blit(image_tiles[15], (x, y))
             x += tile_pixel_size
             if x >= width:
                 x = 0
@@ -429,7 +429,7 @@ class Util_Level_3:
         x = 0
         y = 64
         for tile in map_tiles:
-            window.blit(image_tiles[141], (x, y))
+            window.blit(image_tiles[15], (x, y))
             x += tile_pixel_size
             if x >= width:
                 x = 0
@@ -565,7 +565,7 @@ class Util_Level_4:
         x = 0
         y = 64
         for tile in map_tiles:
-            window.blit(image_tiles[141], (x, y))
+            window.blit(image_tiles[15], (x, y))
             x += tile_pixel_size
             if x >= width:
                 x = 0
