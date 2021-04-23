@@ -8,13 +8,13 @@ pygame.font.init()
 font = pygame.font.SysFont('Arial', 12)
 font_level_solved = pygame.font.SysFont('ComicSans MS', 32)
 
-cwd = os.getcwd()
+path = os.path.dirname(os.path.realpath(__file__))
 background_tile = pygame.image.load(
-    cwd + "/spaghetti/src/assets/colored_tilemap_packed_140.bmp")
+    path + "/assets/colored_tilemap_packed_140.bmp")
 background_rect = background_tile.get_rect()
 tile_pixel_size = 16
 map_tiles = [pygame.image.load(
-    cwd + "/spaghetti/src/assets/colored_tilemap_packed_140.bmp")] * 1024
+    path + "/assets/colored_tilemap_packed_140.bmp")] * 1024
 background_color = (0, 0, 0)  # change from black to more grey
 
 image_tiles = []
@@ -27,8 +27,9 @@ fps = 60
 class Util:
     def load_tile_images():
         i = 0
-        for filename in sorted(os.listdir(cwd + "/spaghetti/src/assets/")):
-            path = cwd + "/spaghetti/src/assets/" + filename
+        asset_path = os.path.dirname(os.path.realpath(__file__)) + "/assets/"
+        for filename in sorted(os.listdir(asset_path)):
+            path = asset_path + filename
             if 'bmp' in path:
                 new_bmp = pygame.image.load(path)
                 new_bmp.convert()
