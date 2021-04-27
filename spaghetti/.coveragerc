@@ -1,0 +1,3 @@
+[run]
+source = src
+omit = src/tests/**, src/level_1.py, src/level_2.py, src/level_3.py, src/level_4.py

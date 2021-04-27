@@ -218,7 +218,6 @@ class Player:
         self.__util.util.add_to_event_list_with_parameter(
             self.__util.player_interact, self.__index)
 
-
 class Player_Util:
     def __init__(self, position_x, position_y):
         self.position_x = position_x
