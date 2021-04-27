@@ -1,6 +1,6 @@
 # työaikakirjanpito
 
-| päivä | aika | mitä tein  |
+| päivä | aika (tunneissa) | mitä tein  |
 | :----:|:-----| :-----|
 | 28.3. | 2    | suunnittelua + vaatimusäärittelyn tekemistä |
 | 29.3. | 2    | vaatimusäärittelyn tekemistä |
@@ -17,4 +17,4 @@
 | 23.4. | 2   | pelin laittamaista toimimaan etätyöpöydällä |
 | 24.4. | 1   | pelin laittamaista toimimaan etätyöpöydällä, refaktorointia |
 | 26.4. | 2   | refaktorointia |
-| 27.4. | 5   | testien toimimaan laittaminen, uusien testien kirjoittaminen, sekvenssikaavio |
+| 27.4. | 5   | refaktorointia, testien toimimaan laittaminen, uusien testien kirjoittaminen, sekvenssikaavio |
