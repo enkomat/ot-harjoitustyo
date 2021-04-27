@@ -9,11 +9,9 @@ Pelin ensimmäistä tasoa voi pelata muokkaamalla 'level_1.py" tiedoston koodia.
 - [Vaatimusmäärittely](./dokumentaatio/vaatimusmaarittely.md)
 - [Työaikakirjanpito](./dokumentaatio/tyoaikakirjanpito.md)
 
-## Komentorivitoiminnot
+## Pelin pelaaminen
 
-### Pelin pelaaminen
-
-## Level 1
+### Level 1
 
 Seuraava komento avaa pelin ensimmäisen tason:
 
@@ -35,7 +33,7 @@ Tason tehtävä on seuraava:
 * liikuta pelaaja oven päälle
 * laita pelaaja avaamaan ovi
 
-## Level 2
+### Level 2
 
 Seuraava komento avaa pelin toisen tason:
 
@@ -59,7 +57,7 @@ Tason tehtävä on seuraava:
   * liikuta pelaajat ovien päälle
   * laita pelaajat avaamaan ovet
 
-## Level 3
+### Level 3
 
 Seuraava komento avaa pelin toisen tason:
 
@@ -83,7 +81,7 @@ Tason tehtävä on seuraava:
   * liikuta kaikki pelaajat ovien päälle
   * laita pelaajat avaamaan ovet
 
-## Level 4
+### Level 4
 
 Seuraava komento avaa pelin toisen tason:
 
@@ -107,7 +105,7 @@ Tason tehtävä on seuraava:
   * liikuta kaikki pelaajat oven päälle
   * laita pelaajat avaamaan ovi
 
-### Testaus
+## Testaus
 
 Testit voi suorittaa seuraavalla kutsulla:
 
