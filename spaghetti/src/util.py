@@ -61,11 +61,17 @@ class Util:
         y += 64
         self.window.blit(self.image_tiles[6], (x, y))
 
-    def draw_goal(self, x, y):
+    def draw_closed_door(self, x, y):
         x *= self.tile_pixel_size
         y *= self.tile_pixel_size
         y += 64
         self.window.blit(self.image_tiles[32], (x, y))
+
+    def draw_open_door(self, x, y):
+        x *= self.tile_pixel_size
+        y *= self.tile_pixel_size
+        y += 64
+        self.window.blit(self.image_tiles[33], (x, y))
 
     def add_to_event_list(self, method_to_add):
         self.event_list.append(method_to_add)
@@ -88,14 +94,18 @@ class Util:
     def quit(self):
         pygame.quit()
 
+class Door_Util:
+    def __init__(self, position_x, position_y):
+        self.position_x = position_x
+        self.position_y = position_y
+        self.is_open = False
 
 class Util_Level_1:
-    def __init__(self, player_x=1, player_y=1, goal_x=30, goal_y=30):
+    def __init__(self, player_x=1, player_y=1):
         self.util = Util()
         self.player_position_x = player_x
         self.player_position_y = player_y
-        self.goal_position_x = goal_x
-        self.goal_position_y = goal_y
+        self.door = Door_Util(30, 30)
         self.event_list = self.util.event_list
 
     def move_player_left(self):
@@ -115,7 +125,8 @@ class Util_Level_1:
         self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def player_interact(self):
-        if self.player_position_x == self.goal_position_x and self.player_position_y == self.goal_position_y:
+        if self.player_position_x == self.door.position_x and self.player_position_y == self.door.position_y:
+            self.door.is_open = True
             return True
         return False
 
@@ -160,11 +171,18 @@ class Util_Level_1:
 
             self.draw_map()
             self.util.draw_coords()
-            self.util.draw_goal(self.goal_position_x, self.goal_position_y)
-            self.util.draw_player(self.player_position_x, self.player_position_y)
+            
+            if self.door.is_open:
+                self.util.draw_open_door(self.door.position_x, self.door.position_y)
+            else:
+                self.util.draw_closed_door(self.door.position_x, self.door.position_y)
+            
             self.draw_ui(event_execution_amount)
+            
             if(self.player_interact()):
                 self.util.draw_text_level_solved()
+            else:
+                self.util.draw_player(self.player_position_x, self.player_position_y)
 
             pygame.display.update()
 
@@ -223,7 +241,7 @@ class Player_Util:
         self.position_x = position_x
         self.position_y = position_y
         self.has_interacted = False
-
+        self.draw_player = True
 
 class Util_Level_2:
     def __init__(self):
@@ -248,23 +266,23 @@ class Util_Level_2:
         self.players = [self.p1, self.p2, self.p3, self.p4, self.p5, self.p6, self.p7, self.p8,
                self.p9, self.p10, self.p11, self.p12, self.p13, self.p14, self.p15, self.p16]
         
-        self.g1 = (1, 30)
-        self.g2 = (3, 30)
-        self.g3 = (5, 30)
-        self.g4 = (7, 30)
-        self.g5 = (9, 30)
-        self.g6 = (11, 30)
-        self.g7 = (13, 30)
-        self.g8 = (15, 30)
-        self.g9 = (17, 30)
-        self.g10 = (19, 30)
-        self.g11 = (21, 30)
-        self.g12 = (23, 30)
-        self.g13 = (25, 30)
-        self.g14 = (27, 30)
-        self.g15 = (29, 30)
-        self.g16 = (31, 30)
-        self.goals = [self.g1, self.g2, self.g3, self.g4, self.g5, self.g6, self.g7, self.g8,
+        self.g1 = Door_Util(1, 30)
+        self.g2 = Door_Util(3, 30)
+        self.g3 = Door_Util(5, 30)
+        self.g4 = Door_Util(7, 30)
+        self.g5 = Door_Util(9, 30)
+        self.g6 = Door_Util(11, 30)
+        self.g7 = Door_Util(13, 30)
+        self.g8 = Door_Util(15, 30)
+        self.g9 = Door_Util(17, 30)
+        self.g10 = Door_Util(19, 30)
+        self.g11 = Door_Util(21, 30)
+        self.g12 = Door_Util(23, 30)
+        self.g13 = Door_Util(25, 30)
+        self.g14 = Door_Util(27, 30)
+        self.g15 = Door_Util(29, 30)
+        self.g16 = Door_Util(31, 30)
+        self.doors = [self.g1, self.g2, self.g3, self.g4, self.g5, self.g6, self.g7, self.g8,
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
 
     def draw_ui(self, amt):
@@ -281,8 +299,11 @@ class Util_Level_2:
             if x >= self.util.width:
                 x = 0
                 y += self.util.tile_pixel_size
-        for goal in self.goals:
-            self.util.draw_goal(goal[0], goal[1])
+        for door in self.doors:
+            if door.is_open:
+                self.util.draw_open_door(door.position_x, door.position_y)
+            else:
+                self.util.draw_closed_door(door.position_x, door.position_y)
 
     def move_player_up(self, i):
         self.players[i].position_y -= 1
@@ -305,14 +326,21 @@ class Util_Level_2:
             self.players[i].position_x, self.players[i].position_y)
 
     def player_interact(self, i):
-        if self.over_goal(i):
+        if self.over_door(i):
+            open_door(i)
             self.players[i].has_interacted = True
+            self.players[i].draw_player = False
 
-    def over_goal(self, i):
-        for goal in self.goals:
-            if (goal[0] == self.players[i].position_x) and (goal[1] == self.players[i].position_y):
+    def over_door(self, i):
+        for door in self.doors:
+            if (door.position_x == self.players[i].position_x) and (door.position_y == self.players[i].position_y):
                 return True
         return False
+
+    def open_door(self, i):
+        for door in self.doors:
+            if (door.position_x == self.players[i].position_x) and (door.position_y == self.players[i].position_y):
+                door.is_open = True
 
     def level_has_been_solved(self):
         for player in self.players:
@@ -348,7 +376,8 @@ class Util_Level_2:
             self.util.draw_coords()
             self.draw_ui(event_execution_amount)
             for player in self.players:
-                self.util.draw_player(player.position_x, player.position_y)
+                if player.draw_player:
+                    self.util.draw_player(player.position_x, player.position_y)
             if self.level_has_been_solved():
                 self.util.draw_text_level_solved()
             pygame.display.update()
@@ -403,28 +432,28 @@ class Util_Level_3:
         self.players = [self.p1, self.p2, self.p3, self.p4, self.p5, self.p6, self.p7, self.p8,
                self.p9, self.p10, self.p11, self.p12, self.p13, self.p14, self.p15, self.p16]
         
-        self.g1 = (1, 30)
-        self.g2 = (3, 1)
-        self.g3 = (5, 30)
-        self.g4 = (7, 1)
-        self.g5 = (9, 30)
-        self.g6 = (11, 1)
-        self.g7 = (13, 30)
-        self.g8 = (15, 1)
-        self.g9 = (17, 30)
-        self.g10 = (19, 1)
-        self.g11 = (21, 30)
-        self.g12 = (23, 1)
-        self.g13 = (25, 30)
-        self.g14 = (27, 1)
-        self.g15 = (29, 30)
-        self.g16 = (31, 1)
-        self.goals = [self.g1, self.g2, self.g3, self.g4, self.g5, self.g6, self.g7, self.g8,
+        self.g1 = Door_Util(1, 30)
+        self.g2 = Door_Util(3, 1)
+        self.g3 = Door_Util(5, 30)
+        self.g4 = Door_Util(7, 1)
+        self.g5 = Door_Util(9, 30)
+        self.g6 = Door_Util(11, 1)
+        self.g7 = Door_Util(13, 30)
+        self.g8 = Door_Util(15, 1)
+        self.g9 = Door_Util(17, 30)
+        self.g10 = Door_Util(19, 1)
+        self.g11 = Door_Util(21, 30)
+        self.g12 = Door_Util(23, 1)
+        self.g13 = Door_Util(25, 30)
+        self.g14 = Door_Util(27, 1)
+        self.g15 = Door_Util(29, 30)
+        self.g16 = Door_Util(31, 1)
+        self.doors = [self.g1, self.g2, self.g3, self.g4, self.g5, self.g6, self.g7, self.g8,
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
 
     def draw_ui(self, amt):
         self.util.draw_text('Level_3', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt), 16, 32)
+        self.util.draw_text('call_amount=' + str(amt) + '/480', 16, 32)
 
     def draw_map(self):
         self.util.window.fill(self.util.background_color)
@@ -436,8 +465,11 @@ class Util_Level_3:
             if x >= self.util.width:
                 x = 0
                 y += self.util.tile_pixel_size
-        for goal in self.goals:
-            self.util.draw_goal(goal[0], goal[1])
+        for door in self.doors:
+            if door.is_open:
+                self.util.draw_open_door(door.position_x, door.position_y)
+            else:
+                self.util.draw_closed_door(door.position_x, door.position_y)
 
     def move_player_up(self, i):
         self.players[i].position_y -= 1
@@ -460,14 +492,21 @@ class Util_Level_3:
             self.players[i].position_x, self.players[i].position_y)
 
     def player_interact(self, i):
-        if self.over_goal(i):
+        if self.over_door(i):
+            self.open_door(i)
             self.players[i].has_interacted = True
+            self.players[i].draw_player = False
 
-    def over_goal(self, i):
-        for goal in self.goals:
-            if (goal[0] == self.players[i].position_x) and (goal[1] == self.players[i].position_y):
+    def over_door(self, i):
+        for door in self.doors:
+            if (door.position_x == self.players[i].position_x) and (door.position_y == self.players[i].position_y):
                 return True
         return False
+    
+    def open_door(self, i):
+        for door in self.doors:
+            if (door.position_x == self.players[i].position_x) and (door.position_y == self.players[i].position_y):
+                door.is_open = True
 
     def level_has_been_solved(self):
         for player in self.players:
@@ -503,7 +542,8 @@ class Util_Level_3:
             self.util.draw_coords()
             self.draw_ui(event_execution_amount)
             for player in self.players:
-                self.util.draw_player(player.position_x, player.position_y)
+                if player.draw_player:
+                    self.util.draw_player(player.position_x, player.position_y)
             if self.level_has_been_solved():
                 self.util.draw_text_level_solved()
             pygame.display.update()
@@ -560,11 +600,11 @@ class Util_Level_4:
         self.players = [self.p1, self.p2, self.p3, self.p4, self.p5, self.p6, self.p7, self.p8,
                self.p9, self.p10, self.p11, self.p12, self.p13, self.p14, self.p15, self.p16]
         
-        self.g1 = (15, 15)
+        self.door = Door_Util(15, 15)
 
     def draw_ui(self, amt):
         self.util.draw_text('Level_4', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt) + '/367', 16, 32)
+        self.util.draw_text('call_amount=' + str(amt) + '/368', 16, 32)
 
     def draw_map(self):
         self.util.window.fill(self.util.background_color)
@@ -576,7 +616,10 @@ class Util_Level_4:
             if x >= self.util.width:
                 x = 0
                 y += self.util.tile_pixel_size
-            self.util.draw_goal(self.g1[0], self.g1[1])
+            if self.door.is_open:
+                self.util.draw_open_door(self.door.position_x, self.door.position_y)
+            else:
+                self.util.draw_closed_door(self.door.position_x, self.door.position_y)
 
     def move_player_up(self, i):
         self.players[i].position_y -= 1
@@ -600,10 +643,12 @@ class Util_Level_4:
 
     def player_interact(self, i):
         if self.over_goal(i):
+            self.door.is_open = True
             self.players[i].has_interacted = True
+            self.players[i].draw_player = False
 
     def over_goal(self, i):
-        if (self.g1[0] == self.players[i].position_x) and (self.g1[0] == self.players[i].position_y):
+        if (self.door.position_x == self.players[i].position_x) and (self.door.position_y == self.players[i].position_y):
             return True
         return False
 
@@ -641,7 +686,8 @@ class Util_Level_4:
             self.util.draw_coords()
             self.draw_ui(event_execution_amount)
             for player in self.players:
-                self.util.draw_player(player.position_x, player.position_y)
+                if player.draw_player:
+                    self.util.draw_player(player.position_x, player.position_y)
             if self.level_has_been_solved():
                 self.util.draw_text_level_solved()
             pygame.display.update()
