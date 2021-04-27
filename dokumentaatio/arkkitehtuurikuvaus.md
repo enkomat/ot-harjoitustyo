@@ -1,5 +1,9 @@
 # Arkkitehtuurikuvaus
 
+## Sovelluslogiikka
+
+![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/classdiagram.png)
+
 ## Päätoiminnallisuudet
 
 ### Ensimmäisen tason ratkaiseminen

@@ -8,6 +8,7 @@ Pelin ensimmäistä tasoa voi pelata muokkaamalla 'level_1.py" tiedoston koodia.
 
 - [Vaatimusmäärittely](./dokumentaatio/vaatimusmaarittely.md)
 - [Työaikakirjanpito](./dokumentaatio/tyoaikakirjanpito.md)
+- [Arkkitehtuurikuvaus](./dokumentaatio/arkkitehtuurikuvaus.md)
 
 ## Pelin pelaaminen
 
