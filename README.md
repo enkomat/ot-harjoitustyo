@@ -24,16 +24,20 @@ poetry run invoke level1
 Tason muokattava koodi löytyy osoitteesta /spaghetti/src/level_1.py
 
 Tasolla ovat käytettävisä seuraavat metodikutsut:
-    * move_player_down() - liikuttaa pelaaja yhden ruudun alaspäin
-    * move_player_up() - liikuttaa pelaajaa yhden ruudun ylöspäin
-    * move_player_left() - liikuttaa pelaajaa yhden ruudun vasemmalle
-    * move_player_right() - liikuttaa pelaajaa yhden ruudun oikealle
-    * player_interact() - laita pelaaja tekemään jotain pelimaailmassa
+  * nmove_player_down() - liikuttaa pelaaja yhden ruudun alaspäin
+  * move_player_up() - liikuttaa pelaajaa yhden ruudun ylöspäin
+  * move_player_left() - liikuttaa pelaajaa yhden ruudun vasemmalle
+  * move_player_right() - liikuttaa pelaajaa yhden ruudun oikealle
+  * player_interact() - laita pelaaja tekemään jotain pelimaailmassa
 
 Tason tehtävä on seuraava:
-    * liikuta pelaaja oven päälle
-    * laita pelaaja avaamaan ovi
+  * liikuta pelaaja oven päälle
+  * laita pelaaja avaamaan ovi
 
 ### Testaus
 
-Testit ei vielä harmillisesti toimi kunnolla. Olen ollut hieman jäljessä aikataulusta, mutta tulevan viikon aikana pitää ottaa kiinni missatut asiat!
+Testit voi suorittaa seuraavalla kutsulla:
+
+```bash
+poetry run invoke test
+```
