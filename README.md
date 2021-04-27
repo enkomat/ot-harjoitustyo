@@ -113,3 +113,15 @@ Testit voi suorittaa seuraavalla kutsulla:
 ```bash
 poetry run invoke test
 ```
+
+Coverage sovelluksen voi suorittaa seuraavalla komennolla:
+
+```bash
+poetry run invoke coverage
+```
+
+Coverage raportin voi luoda seuraavalla komennolla:
+
+```bash
+poetry run invoke coveragereport
+```
