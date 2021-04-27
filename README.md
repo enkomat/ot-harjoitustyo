@@ -11,55 +11,28 @@ Pelin ensimmäistä tasoa voi pelata muokkaamalla 'level_1.py" tiedoston koodia.
 
 ## Komentorivitoiminnot
 
-### Pelin suorittaminen
+### Pelin pelaaminen
+
+## Level 1
 
 Seuraava komento avaa pelin ensimmäisen tason:
-
-```bash
-poetry run invoke start
-```
-
-Tason voi myös vaihtoehtoisesti avata seruaavalla komennolla:
 
 ```bash
 poetry run invoke level1
 ```
 
-Pelin ensimmäisen tason pelaajan liikettä voit kontrolloida Python koodilla. Tätä koodia voit lähteä muokkaamaan suorittamalla seuraavan komennon, joka avaa sen oletuseditorissa:
+Tason muokattava koodi löytyy osoitteesta /spaghetti/src/level_1.py
 
-```bash
-open src/level_1.py
-```
+Tasolla ovat käytettävisä seuraavat metodikutsut:
+    * move_player_down() - liikuttaa pelaaja yhden ruudun alaspäin
+    * move_player_up() - liikuttaa pelaajaa yhden ruudun ylöspäin
+    * move_player_left() - liikuttaa pelaajaa yhden ruudun vasemmalle
+    * move_player_right() - liikuttaa pelaajaa yhden ruudun oikealle
+    * player_interact() - laita pelaaja tekemään jotain pelimaailmassa
 
-Koodia voi myös toki tarkastella ja editoida suoraan komentoriviltä Nanon avulla:
-
-```bash
-nano src/level_1.py
-```
-
-Pelissä on tällä hetkellä neljä tasoa, joiden kaikkien pitäisi toimia. Kun taso on suoritettu, ilmestyy peliruudulle "level solved" teksti.
-
-Toisen tason voi avata seuraavilla komennoilla:
-
-```bash
-poetry run invoke level2
-```
-
-```bash
-open src/level_2.py
-```
-
-Ja kolmannen seuraavilla:
-
-```bash
-poetry run invoke level3
-```
-
-```bash
-open src/level_3.py
-```
-
-Neljännen samalla kaavalla.
+Tason tehtävä on seuraava:
+    * liikuta pelaaja oven päälle
+    * laita pelaaja avaamaan ovi
 
 ### Testaus
 
