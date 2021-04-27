@@ -1,31 +1,31 @@
 import pygame
 import os
 
-width, height = 8*64, 9*64
-window = pygame.display.set_mode((width, height))
-pygame.display.set_caption("spaghetti")
-pygame.font.init()
-font = pygame.font.SysFont('Arial', 12)
-font_level_solved = pygame.font.SysFont('ComicSans MS', 32)
-
-path = os.path.dirname(os.path.realpath(__file__))
-background_tile = pygame.image.load(
-    path + "/assets/colored_tilemap_packed_140.bmp")
-background_rect = background_tile.get_rect()
-tile_pixel_size = 16
-map_tiles = [pygame.image.load(
-    path + "/assets/colored_tilemap_packed_140.bmp")] * 1024
-background_color = (0, 0, 0)  # change from black to more grey
-
-image_tiles = []
-
-event_list = []
-event_parameter_list = []
-
-fps = 60
-
 class Util:
-    def load_tile_images():
+    def __init__(self):
+        pygame.init()
+        self.width = 8*64
+        self.height = 9*64
+        self.window = pygame.display.set_mode((self.width, self.height))
+        pygame.display.set_caption("spaghetti")
+        pygame.font.init()
+        self.font = pygame.font.SysFont('Arial', 12)
+        self.font_level_solved = pygame.font.SysFont('ComicSans MS', 32)
+
+        self.path = os.path.dirname(os.path.realpath(__file__))
+        self.tile_pixel_size = 16
+        self.map_tiles = [pygame.image.load(
+            self.path + "/assets/colored_tilemap_packed_140.bmp")] * 1024
+        self.background_color = (0, 0, 0)  # change from black to more grey
+
+        self.image_tiles = []
+
+        self.event_list = []
+        self.event_parameter_list = []
+
+        self.fps = 60
+
+    def load_tile_images(self):
         i = 0
         asset_path = os.path.dirname(os.path.realpath(__file__)) + "/assets/"
         for filename in sorted(os.listdir(asset_path)):
@@ -33,84 +33,86 @@ class Util:
             if 'bmp' in path:
                 new_bmp = pygame.image.load(path)
                 new_bmp.convert()
-                image_tiles.append(new_bmp)
+                self.image_tiles.append(new_bmp)
 
-    def draw_text(text, x, y):
-        text_surface = font.render(text, False, (255, 255, 255))
-        window.blit(text_surface, (x, y))
+    def draw_text(self, text, x, y):
+        text_surface = self.font.render(text, False, (255, 255, 255))
+        self.window.blit(text_surface, (x, y))
 
-    def draw_text_level_solved():
-        text_surface = font_level_solved.render(
+    def draw_text_level_solved(self):
+        self.text_surface = self.font_level_solved.render(
             'LEVEL SOLVED! :)', False, (255, 255, 255))
-        window.blit(text_surface, (128, 256))
+        self.window.blit(self.text_surface, (128, 256))
 
-    def draw_coords():
+    def draw_coords(self):
         x = 0
         y = 64
         for i in range(32):
-            Util.draw_text(str(i), x, y)
+            self.draw_text(str(i), x, y)
             x += 16
         x = 0
         for i in range(32):
-            Util.draw_text(str(i), x, y)
+            self.draw_text(str(i), x, y)
             y += 16
 
-    def draw_player(x, y):
-        x *= tile_pixel_size
-        y *= tile_pixel_size
+    def draw_player(self, x, y):
+        x *= self.tile_pixel_size
+        y *= self.tile_pixel_size
         y += 64
-        window.blit(image_tiles[6], (x, y))
+        self.window.blit(self.image_tiles[6], (x, y))
 
-    def draw_goal(x, y):
-        x *= tile_pixel_size
-        y *= tile_pixel_size
+    def draw_goal(self, x, y):
+        x *= self.tile_pixel_size
+        y *= self.tile_pixel_size
         y += 64
-        window.blit(image_tiles[32], (x, y))
+        self.window.blit(self.image_tiles[32], (x, y))
 
-    def add_to_event_list(method_to_add):
-        event_list.append(method_to_add)
-        event_parameter_list.append(None)
+    def add_to_event_list(self, method_to_add):
+        self.event_list.append(method_to_add)
+        self.event_parameter_list.append(None)
 
-    def add_to_event_list_with_parameter(method_to_add, parameter):
-        event_list.append(method_to_add)
-        event_parameter_list.append(parameter)
+    def add_to_event_list_with_parameter(self, method_to_add, parameter):
+        self.event_list.append(method_to_add)
+        self.event_parameter_list.append(parameter)
 
-    def get_event_list():
-        return event_list
+    def get_event_list(self):
+        return self.event_list
 
-    def execute_next_method_in_event_list():
-        parameter = event_parameter_list.pop(0)
+    def execute_next_method_in_event_list(self):
+        parameter = self.event_parameter_list.pop(0)
         if parameter is None:
-            event_list.pop(0)()
+            self.event_list.pop(0)()
         else:
-            event_list.pop(0)(parameter[0], parameter[1])
+            self.event_list.pop(0)(parameter)
 
-    def quit():
+    def quit(self):
         pygame.quit()
 
 
 class Util_Level_1:
     def __init__(self, player_x=1, player_y=1, goal_x=30, goal_y=30):
+        self.util = Util()
         self.player_position_x = player_x
         self.player_position_y = player_y
         self.goal_position_x = goal_x
         self.goal_position_y = goal_y
+        self.event_list = self.util.event_list
 
     def move_player_left(self):
         self.player_position_x -= 1
-        Util.draw_player(self.player_position_x, self.player_position_y)
+        self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def move_player_right(self):
         self.player_position_x += 1
-        Util.draw_player(self.player_position_x, self.player_position_y)
+        self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def move_player_up(self):
         self.player_position_y -= 1
-        Util.draw_player(self.player_position_x, self.player_position_y)
+        self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def move_player_down(self):
         self.player_position_y += 1
-        Util.draw_player(self.player_position_x, self.player_position_y)
+        self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def player_interact(self):
         if self.player_position_x == self.goal_position_x and self.player_position_y == self.goal_position_y:
@@ -118,50 +120,51 @@ class Util_Level_1:
         return False
 
     def draw_ui(self, amt):
-        Util.draw_text('Level_1', 16, 16)
-        Util.draw_text('call_amount=' + str(amt) + '/59', 16, 32)
+        self.util.draw_text('Level_1', 16, 16)
+        self.util.draw_text('call_amount=' + str(amt) + '/59', 16, 32)
 
     def draw_map(self):
-        window.fill(background_color)
+        self.util.window.fill(self.util.background_color)
         x = 0
         y = 64
-        for tile in map_tiles:
-            window.blit(image_tiles[15], (x, y))
-            x += tile_pixel_size
-            if x >= width:
+        for tile in self.util.map_tiles:
+            self.util.window.blit(self.util.image_tiles[15], (x, y))
+            x += self.util.tile_pixel_size
+            if x >= self.util.width:
                 x = 0
-                y += tile_pixel_size
+                y += self.util.tile_pixel_size
 
     def run(self, is_test=False):
         event_execution_amount = 0
-        Util.load_tile_images()
-        clock = pygame.time.Clock()
+        self.util.load_tile_images()
+        self.clock = pygame.time.Clock()
         time_since_last_event_list_execute = 0.0
         run = True
 
         while run:
-            if is_test and len(event_list) == 0:
+            if is_test and len(self.event_list) == 0:
                 pygame.quit()
+                return None
 
-            clock.tick(fps)
-            time_since_last_event_list_execute += clock.tick(fps)
+            self.clock.tick(self.util.fps)
+            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
 
-            if len(event_list) > 0 and time_since_last_event_list_execute > 40:
-                Util.execute_next_method_in_event_list()
+            if len(self.event_list) > 0 and time_since_last_event_list_execute > 40:
+                self.util.execute_next_method_in_event_list()
                 event_execution_amount += 1
                 time_since_last_event_list_execute = 0
 
             self.draw_map()
-            Util.draw_coords()
-            Util.draw_goal(self.goal_position_x, self.goal_position_y)
-            Util.draw_player(self.player_position_x, self.player_position_y)
+            self.util.draw_coords()
+            self.util.draw_goal(self.goal_position_x, self.goal_position_y)
+            self.util.draw_player(self.player_position_x, self.player_position_y)
             self.draw_ui(event_execution_amount)
             if(self.player_interact()):
-                Util.draw_text_level_solved()
+                self.util.draw_text_level_solved()
 
             pygame.display.update()
 
@@ -170,26 +173,25 @@ class Util_Level_1:
 
 class Level_1:
     def __init__(self):
-        self.__util_level1 = Util_Level_1()
+        self.__util_level_1 = Util_Level_1()
 
     def move_player_left(self):
-        Util.add_to_event_list(self.__util_level1.move_player_left)
+        self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_left)
 
     def move_player_right(self):
-        Util.add_to_event_list(self.__util_level1.move_player_right)
+        self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_right)
 
     def move_player_up(self):
-        Util.add_to_event_list(self.__util_level1.move_player_up)
+        self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_up)
 
     def move_player_down(self):
-        Util.add_to_event_list(self.__util_level1.move_player_down)
+        self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_down)
 
     def player_interact(self):
-        Util.add_to_event_list(self.__util_level1.player_interact)
+        self.__util_level_1.util.add_to_event_list(self.__util_level_1.player_interact)
 
-    def run(self, is_test=False):  # is_test should be removed from the main level class
-        self.__util_level1.run(is_test)
-
+    def run(self):
+        self.__util_level_1.run()
 
 class Player:
     def __init__(self, index, util):
@@ -197,31 +199,27 @@ class Player:
         self.__util = util
 
     def move_player_left(self):
-        Util.add_to_event_list_with_parameter(
-            Util_Level_2.move_player_left, (self.__util, self.__index))
+        self.__util.util.add_to_event_list_with_parameter(
+            self.__util.move_player_left, self.__index)
 
     def move_player_right(self):
-        Util.add_to_event_list_with_parameter(
-            Util_Level_2.move_player_right, (self.__util, self.__index))
+        self.__util.util.add_to_event_list_with_parameter(
+            self.__util.move_player_right, self.__index)
 
     def move_player_up(self):
-        Util.add_to_event_list_with_parameter(
-            Util_Level_2.move_player_up, (self.__util, self.__index))
+        self.__util.util.add_to_event_list_with_parameter(
+            self.__util.move_player_up, self.__index)
 
     def move_player_down(self):
-        Util.add_to_event_list_with_parameter(
-            Util_Level_2.move_player_down, (self.__util, self.__index))
+        self.__util.util.add_to_event_list_with_parameter(
+            self.__util.move_player_down, self.__index)
 
     def interact(self):
-        Util.add_to_event_list_with_parameter(
-            Util_Level_2.player_interact, (self.__util, self.__index))
+        self.__util.util.add_to_event_list_with_parameter(
+            self.__util.player_interact, self.__index)
 
 
 class Player_Util:
-    position_x = 0
-    position_y = 0
-    has_interacted = False
-
     def __init__(self, position_x, position_y):
         self.position_x = position_x
         self.position_y = position_y
@@ -230,6 +228,8 @@ class Player_Util:
 
 class Util_Level_2:
     def __init__(self):
+        self.util = Util()
+
         self.p1 = Player_Util(1, 1)
         self.p2 = Player_Util(3, 1)
         self.p3 = Player_Util(5, 1)
@@ -269,41 +269,41 @@ class Util_Level_2:
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
 
     def draw_ui(self, amt):
-        Util.draw_text('Level_2', 16, 16)
-        Util.draw_text('call_amount=' + str(amt) + '/480', 16, 32)
+        self.util.draw_text('Level_2', 16, 16)
+        self.util.draw_text('call_amount=' + str(amt) + '/480', 16, 32)
 
     def draw_map(self):
-        window.fill(background_color)
+        self.util.window.fill(self.util.background_color)
         x = 0
         y = 64
-        for tile in map_tiles:
-            window.blit(image_tiles[15], (x, y))
-            x += tile_pixel_size
-            if x >= width:
+        for tile in self.util.map_tiles:
+            self.util.window.blit(self.util.image_tiles[15], (x, y))
+            x += self.util.tile_pixel_size
+            if x >= self.util.width:
                 x = 0
-                y += tile_pixel_size
+                y += self.util.tile_pixel_size
         for goal in self.goals:
-            Util.draw_goal(goal[0], goal[1])
+            self.util.draw_goal(goal[0], goal[1])
 
     def move_player_up(self, i):
         self.players[i].position_y -= 1
-        Util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
+        self.util.draw_player(
+            self.players[i].position_x, self.players[i].position_y)
 
     def move_player_down(self, i):
         self.players[i].position_y += 1
-        Util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
+        self.util.draw_player(
+            self.players[i].position_x, self.players[i].position_y)
 
     def move_player_left(self, i):
         self.players[i].position_x -= 1
-        Util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
+        self.util.draw_player(
+            self.players[i].position_x, self.players[i].position_y)
 
     def move_player_right(self, i):
         self.players[i].position_x += 1
-        Util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
+        self.util.draw_player(
+            self.players[i].position_x, self.players[i].position_y)
 
     def player_interact(self, i):
         if self.over_goal(i):
@@ -322,67 +322,69 @@ class Util_Level_2:
         return True
 
     def run(self, is_test=False):
-        if is_test and len(event_list) == 0:
-            run = False
-
         event_execution_amount = 0
-        Util.load_tile_images()
-        clock = pygame.time.Clock()
+        self.util.load_tile_images()
+        self.clock = pygame.time.Clock()
         time_since_last_event_list_execute = 0.0
 
         run = True
         while run:
-            clock.tick(fps)
-            time_since_last_event_list_execute += clock.tick(fps)
+            if is_test and len(self.util.event_list) == 0:
+                run = False
+                return None
+
+            self.clock.tick(self.util.fps)
+            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
 
-            if(len(event_list) > 0 and time_since_last_event_list_execute > 2):
-                Util.execute_next_method_in_event_list()
+            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
+                self.util.execute_next_method_in_event_list()
                 event_execution_amount += 1
                 time_since_last_event_list_execute = 0
 
             self.draw_map()
-            Util.draw_coords()
+            self.util.draw_coords()
             self.draw_ui(event_execution_amount)
             for player in self.players:
-                Util.draw_player(player.position_x, player.position_y)
+                self.util.draw_player(player.position_x, player.position_y)
             if self.level_has_been_solved():
-                Util.draw_text_level_solved()
+                self.util.draw_text_level_solved()
             pygame.display.update()
 
         pygame.quit()
 
-
 class Level_2:
     def __init__(self, players = []):
-        self.__util_lvl2 = Util_Level_2()
-        self.__p1 = Player(0, self.__util_lvl2)
-        self.__p2 = Player(1, self.__util_lvl2)
-        self.__p3 = Player(2, self.__util_lvl2)
-        self.__p4 = Player(3, self.__util_lvl2)
-        self.__p5 = Player(4, self.__util_lvl2)
-        self.__p6 = Player(5, self.__util_lvl2)
-        self.__p7 = Player(6, self.__util_lvl2)
-        self.__p8 = Player(7, self.__util_lvl2)
-        self.__p9 = Player(8, self.__util_lvl2)
-        self.__p10 = Player(9, self.__util_lvl2)
-        self.__p11 = Player(10, self.__util_lvl2)
-        self.__p12 = Player(11, self.__util_lvl2)
-        self.__p13 = Player(12, self.__util_lvl2)
-        self.__p14 = Player(13, self.__util_lvl2)
-        self.__p15 = Player(14, self.__util_lvl2)
-        self.__p16 = Player(15, self.__util_lvl2)
+        self.__util_level_2 = Util_Level_2()
+        self.__p1 = Player(0, self.__util_level_2)
+        self.__p2 = Player(1, self.__util_level_2)
+        self.__p3 = Player(2, self.__util_level_2)
+        self.__p4 = Player(3, self.__util_level_2)
+        self.__p5 = Player(4, self.__util_level_2)
+        self.__p6 = Player(5, self.__util_level_2)
+        self.__p7 = Player(6, self.__util_level_2)
+        self.__p8 = Player(7, self.__util_level_2)
+        self.__p9 = Player(8, self.__util_level_2)
+        self.__p10 = Player(9, self.__util_level_2)
+        self.__p11 = Player(10, self.__util_level_2)
+        self.__p12 = Player(11, self.__util_level_2)
+        self.__p13 = Player(12, self.__util_level_2)
+        self.__p14 = Player(13, self.__util_level_2)
+        self.__p15 = Player(14, self.__util_level_2)
+        self.__p16 = Player(15, self.__util_level_2)
         self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
                 self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
 
     def run(self):
-        self.__util_lvl2.run()
+        self.__util_level_2.run()
 
 class Util_Level_3:
     def __init__(self):
+        self.util = Util()
+        
         self.p1 = Player_Util(1, 1)
         self.p2 = Player_Util(3, 30)
         self.p3 = Player_Util(5, 1)
@@ -422,40 +424,40 @@ class Util_Level_3:
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
 
     def draw_ui(self, amt):
-        Util.draw_text('Level_4', 16, 16)
-        Util.draw_text('call_amount=' + str(amt), 16, 32)
+        self.util.draw_text('Level_4', 16, 16)
+        self.util.draw_text('call_amount=' + str(amt), 16, 32)
 
     def draw_map(self):
-        window.fill(background_color)
+        self.util.window.fill(self.util.background_color)
         x = 0
         y = 64
-        for tile in map_tiles:
-            window.blit(image_tiles[15], (x, y))
-            x += tile_pixel_size
-            if x >= width:
+        for tile in self.util.map_tiles:
+            self.util.window.blit(self.util.image_tiles[15], (x, y))
+            x += self.util.tile_pixel_size
+            if x >= self.util.width:
                 x = 0
-                y += tile_pixel_size
+                y += self.util.tile_pixel_size
         for goal in self.goals:
-            Util.draw_goal(goal[0], goal[1])
+            self.util.draw_goal(goal[0], goal[1])
 
     def move_player_up(self, i):
         self.players[i].position_y -= 1
-        Util.draw_player(
+        self.util.draw_player(
             self.players[i].position_x, self.players[0].position_x)
 
     def move_player_down(self, i):
         self.players[i].position_y += 1
-        Util.draw_player(
+        self.util.draw_player(
             self.players[i].position_x, self.players[0].position_x)
 
     def move_player_left(self, i):
         self.players[i].position_x -= 1
-        Util.draw_player(
+        self.util.draw_player(
             self.players[i].position_x, self.players[0].position_x)
 
     def move_player_right(self, i):
         self.players[i].position_x += 1
-        Util.draw_player(
+        self.util.draw_player(
             self.players[i].position_x, self.players[0].position_x)
 
     def player_interact(self, i):
@@ -475,35 +477,35 @@ class Util_Level_3:
         return True
 
     def run(self, is_test=False):
-        if is_test and len(event_list) == 0:
+        if is_test and len(self.util.event_list) == 0:
             run = False
 
         event_execution_amount = 0
-        Util.load_tile_images()
-        clock = pygame.time.Clock()
+        self.util.load_tile_images()
+        self.clock = pygame.time.Clock()
         time_since_last_event_list_execute = 0.0
 
         run = True
         while run:
-            clock.tick(fps)
-            time_since_last_event_list_execute += clock.tick(fps)
+            self.clock.tick(self.util.fps)
+            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
 
-            if(len(event_list) > 0 and time_since_last_event_list_execute > 2):
-                Util.execute_next_method_in_event_list()
+            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
+                self.util.execute_next_method_in_event_list()
                 event_execution_amount += 1
                 time_since_last_event_list_execute = 0
 
             self.draw_map()
-            Util.draw_coords()
+            self.util.draw_coords()
             self.draw_ui(event_execution_amount)
             for player in self.players:
-                Util.draw_player(player.position_x, player.position_y)
+                self.util.draw_player(player.position_x, player.position_y)
             if self.level_has_been_solved():
-                Util.draw_text_level_solved()
+                self.util.draw_text_level_solved()
             pygame.display.update()
 
         pygame.quit()
@@ -536,6 +538,8 @@ class Level_3:
 
 class Util_Level_4:
     def __init__(self):
+        self.util = Util()
+
         self.p1 = Player_Util(1, 1)
         self.p2 = Player_Util(3, 1)
         self.p3 = Player_Util(5, 1)
@@ -558,39 +562,39 @@ class Util_Level_4:
         self.g1 = (15, 15)
 
     def draw_ui(self, amt):
-        Util.draw_text('Level_3', 16, 16)
-        Util.draw_text('call_amount=' + str(amt) + '/480', 16, 32)
+        self.util.draw_text('Level_3', 16, 16)
+        self.util.draw_text('call_amount=' + str(amt) + '/480', 16, 32)
 
     def draw_map(self):
-        window.fill(background_color)
+        self.util.window.fill(self.util.background_color)
         x = 0
         y = 64
-        for tile in map_tiles:
-            window.blit(image_tiles[15], (x, y))
-            x += tile_pixel_size
-            if x >= width:
+        for tile in self.util.map_tiles:
+            self.util.window.blit(self.util.image_tiles[15], (x, y))
+            x += self.util.tile_pixel_size
+            if x >= self.util.width:
                 x = 0
-                y += tile_pixel_size
-            Util.draw_goal(self.g1[0], self.g1[1])
+                y += self.util.tile_pixel_size
+            self.util.draw_goal(self.g1[0], self.g1[1])
 
     def move_player_up(self, i):
         self.players[i].position_y -= 1
-        Util.draw_player(
+        self.util.draw_player(
             self.players[i].position_x, self.players[0].position_x)
 
     def move_player_down(self, i):
         self.players[i].position_y += 1
-        Util.draw_player(
+        self.util.draw_player(
             self.players[i].position_x, self.players[0].position_x)
 
     def move_player_left(self, i):
         self.players[i].position_x -= 1
-        Util.draw_player(
+        self.util.draw_player(
             self.players[i].position_x, self.players[0].position_x)
 
     def move_player_right(self, i):
         self.players[i].position_x += 1
-        Util.draw_player(
+        self.util.draw_player(
             self.players[i].position_x, self.players[0].position_x)
 
     def player_interact(self, i):
@@ -609,35 +613,35 @@ class Util_Level_4:
         return True
 
     def run(self, is_test=False):
-        if is_test and len(event_list) == 0:
+        if is_test and len(self.util.event_list) == 0:
             run = False
 
         event_execution_amount = 0
-        Util.load_tile_images()
-        clock = pygame.time.Clock()
+        self.util.load_tile_images()
+        self.clock = pygame.time.Clock()
         time_since_last_event_list_execute = 0.0
 
         run = True
         while run:
-            clock.tick(fps)
-            time_since_last_event_list_execute += clock.tick(fps)
+            self.clock.tick(self.util.fps)
+            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
 
-            if(len(event_list) > 0 and time_since_last_event_list_execute > 2):
-                Util.execute_next_method_in_event_list()
+            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
+                self.util.execute_next_method_in_event_list()
                 event_execution_amount += 1
                 time_since_last_event_list_execute = 0
 
             self.draw_map()
-            Util.draw_coords()
+            self.util.draw_coords()
             self.draw_ui(event_execution_amount)
             for player in self.players:
-                Util.draw_player(player.position_x, player.position_y)
+                self.util.draw_player(player.position_x, player.position_y)
             if self.level_has_been_solved():
-                Util.draw_text_level_solved()
+                self.util.draw_text_level_solved()
             pygame.display.update()
 
         pygame.quit()

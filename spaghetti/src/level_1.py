@@ -5,11 +5,11 @@ lvl1 = Level_1()
 
 # write your solution between the lines below
 # you have the following methods to use to control the player:
-# Level_1.move_player_down()
-# Level_1.move_player_up()
-# Level_1.move_player_left()
-# Level_1.move_player_right()
-# Level_1.player_interact()
+# lvl1.move_player_down()
+# lvl1.move_player_up()
+# lvl1.move_player_left()
+# lvl1.move_player_right()
+# lvl1.player_interact()
 # REMEMBER TO USE INTERACT TO INTERACT WITH OBJECTS
 # INTERACTING IS REQUIRED TO SOLVE A LEVEL
 # -------------------------------------
