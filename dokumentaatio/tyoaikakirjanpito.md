@@ -13,3 +13,8 @@
 | 17.4. | 3   | uusia tasoja ja niiden hiomista |
 | 19.4. | 3   | tasojen ja koodin säätöä, testien toimimaan laittamisen yrittämistä |
 | 20.4. | 4   | luokkien ja testien refaktorointia, testien toteutus jäi puolitiehen |
+| 22.4. | 2   | pelin laittamaista toimimaan etätyöpöydällä |
+| 23.4. | 2   | pelin laittamaista toimimaan etätyöpöydällä |
+| 24.4. | 1   | pelin laittamaista toimimaan etätyöpöydällä, refaktorointia |
+| 26.4. | 2   | refaktorointia |
+| 27.4. | 5   | testien toimimaan laittaminen, uusien testien kirjoittaminen, sekvenssikaavio |
