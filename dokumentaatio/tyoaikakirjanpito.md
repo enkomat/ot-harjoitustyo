@@ -17,4 +17,4 @@
 | 23.4. | 2   | pelin laittamaista toimimaan etätyöpöydällä |
 | 24.4. | 1   | pelin laittamaista toimimaan etätyöpöydällä, refaktorointia |
 | 26.4. | 2   | refaktorointia |
-| 27.4. | 5   | refaktorointia, testien toimimaan laittaminen, uusien testien kirjoittaminen, sekvenssikaavio |
+| 27.4. | 6   | refaktorointia, testien toimimaan laittaminen, uusien testien kirjoittaminen, sekvenssikaavio |
