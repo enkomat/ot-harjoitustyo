@@ -423,7 +423,7 @@ class Util_Level_3:
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
 
     def draw_ui(self, amt):
-        self.util.draw_text('Level_4', 16, 16)
+        self.util.draw_text('Level_3', 16, 16)
         self.util.draw_text('call_amount=' + str(amt), 16, 32)
 
     def draw_map(self):
@@ -442,22 +442,22 @@ class Util_Level_3:
     def move_player_up(self, i):
         self.players[i].position_y -= 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
+            self.players[i].position_x, self.players[i].position_y)
 
     def move_player_down(self, i):
         self.players[i].position_y += 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
+            self.players[i].position_x, self.players[i].position_y)
 
     def move_player_left(self, i):
         self.players[i].position_x -= 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
+            self.players[i].position_x, self.players[i].position_y)
 
     def move_player_right(self, i):
         self.players[i].position_x += 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
+            self.players[i].position_x, self.players[i].position_y)
 
     def player_interact(self, i):
         if self.over_goal(i):
@@ -476,9 +476,6 @@ class Util_Level_3:
         return True
 
     def run(self, is_test=False):
-        if is_test and len(self.util.event_list) == 0:
-            run = False
-
         event_execution_amount = 0
         self.util.load_tile_images()
         self.clock = pygame.time.Clock()
@@ -486,6 +483,10 @@ class Util_Level_3:
 
         run = True
         while run:
+            if is_test and len(self.util.event_list) == 0:
+                run = False
+                return None
+
             self.clock.tick(self.util.fps)
             time_since_last_event_list_execute += self.clock.tick(self.util.fps)
 
@@ -512,28 +513,29 @@ class Util_Level_3:
 
 class Level_3:
     def __init__(self, players = []):
-        self.__util_lvl3 = Util_Level_3()
-        self.__p1 = Player(0, self.__util_lvl3)
-        self.__p2 = Player(1, self.__util_lvl3)
-        self.__p3 = Player(2, self.__util_lvl3)
-        self.__p4 = Player(3, self.__util_lvl3)
-        self.__p5 = Player(4, self.__util_lvl3)
-        self.__p6 = Player(5, self.__util_lvl3)
-        self.__p7 = Player(6, self.__util_lvl3)
-        self.__p8 = Player(7, self.__util_lvl3)
-        self.__p9 = Player(8, self.__util_lvl3)
-        self.__p10 = Player(9, self.__util_lvl3)
-        self.__p11 = Player(10, self.__util_lvl3)
-        self.__p12 = Player(11, self.__util_lvl3)
-        self.__p13 = Player(12, self.__util_lvl3)
-        self.__p14 = Player(13, self.__util_lvl3)
-        self.__p15 = Player(14, self.__util_lvl3)
-        self.__p16 = Player(15, self.__util_lvl3)
+        self.__util_level_3 = Util_Level_3()
+
+        self.__p1 = Player(0, self.__util_level_3)
+        self.__p2 = Player(1, self.__util_level_3)
+        self.__p3 = Player(2, self.__util_level_3)
+        self.__p4 = Player(3, self.__util_level_3)
+        self.__p5 = Player(4, self.__util_level_3)
+        self.__p6 = Player(5, self.__util_level_3)
+        self.__p7 = Player(6, self.__util_level_3)
+        self.__p8 = Player(7, self.__util_level_3)
+        self.__p9 = Player(8, self.__util_level_3)
+        self.__p10 = Player(9, self.__util_level_3)
+        self.__p11 = Player(10, self.__util_level_3)
+        self.__p12 = Player(11, self.__util_level_3)
+        self.__p13 = Player(12, self.__util_level_3)
+        self.__p14 = Player(13, self.__util_level_3)
+        self.__p15 = Player(14, self.__util_level_3)
+        self.__p16 = Player(15, self.__util_level_3)
         self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
                 self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
 
     def run(self):
-        self.__util_lvl3.run()
+        self.__util_level_3.run()
 
 class Util_Level_4:
     def __init__(self):
@@ -561,8 +563,8 @@ class Util_Level_4:
         self.g1 = (15, 15)
 
     def draw_ui(self, amt):
-        self.util.draw_text('Level_3', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt) + '/480', 16, 32)
+        self.util.draw_text('Level_4', 16, 16)
+        self.util.draw_text('call_amount=' + str(amt) + '/367', 16, 32)
 
     def draw_map(self):
         self.util.window.fill(self.util.background_color)
@@ -612,9 +614,6 @@ class Util_Level_4:
         return True
 
     def run(self, is_test=False):
-        if is_test and len(self.util.event_list) == 0:
-            run = False
-
         event_execution_amount = 0
         self.util.load_tile_images()
         self.clock = pygame.time.Clock()
@@ -622,6 +621,10 @@ class Util_Level_4:
 
         run = True
         while run:
+            if is_test and len(self.util.event_list) == 0:
+                run = False
+                return None
+
             self.clock.tick(self.util.fps)
             time_since_last_event_list_execute += self.clock.tick(self.util.fps)
 
@@ -648,25 +651,26 @@ class Util_Level_4:
 
 class Level_4:
     def __init__(self, players = []):
-        self.__util_lvl4 = Util_Level_4()
-        self.__p1 = Player(0, self.__util_lvl4)
-        self.__p2 = Player(1, self.__util_lvl4)
-        self.__p3 = Player(2, self.__util_lvl4)
-        self.__p4 = Player(3, self.__util_lvl4)
-        self.__p5 = Player(4, self.__util_lvl4)
-        self.__p6 = Player(5, self.__util_lvl4)
-        self.__p7 = Player(6, self.__util_lvl4)
-        self.__p8 = Player(7, self.__util_lvl4)
-        self.__p9 = Player(8, self.__util_lvl4)
-        self.__p10 = Player(9, self.__util_lvl4)
-        self.__p11 = Player(10, self.__util_lvl4)
-        self.__p12 = Player(11, self.__util_lvl4)
-        self.__p13 = Player(12, self.__util_lvl4)
-        self.__p14 = Player(13, self.__util_lvl4)
-        self.__p15 = Player(14, self.__util_lvl4)
-        self.__p16 = Player(15, self.__util_lvl4)
+        self.__util_level_4 = Util_Level_4()
+
+        self.__p1 = Player(0, self.__util_level_4)
+        self.__p2 = Player(1, self.__util_level_4)
+        self.__p3 = Player(2, self.__util_level_4)
+        self.__p4 = Player(3, self.__util_level_4)
+        self.__p5 = Player(4, self.__util_level_4)
+        self.__p6 = Player(5, self.__util_level_4)
+        self.__p7 = Player(6, self.__util_level_4)
+        self.__p8 = Player(7, self.__util_level_4)
+        self.__p9 = Player(8, self.__util_level_4)
+        self.__p10 = Player(9, self.__util_level_4)
+        self.__p11 = Player(10, self.__util_level_4)
+        self.__p12 = Player(11, self.__util_level_4)
+        self.__p13 = Player(12, self.__util_level_4)
+        self.__p14 = Player(13, self.__util_level_4)
+        self.__p15 = Player(14, self.__util_level_4)
+        self.__p16 = Player(15, self.__util_level_4)
         self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
                 self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
 
     def run(self):
-        self.__util_lvl4.run()
+        self.__util_level_4.run()
