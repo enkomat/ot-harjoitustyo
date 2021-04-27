@@ -59,6 +59,54 @@ Tason tehtävä on seuraava:
   * liikuta pelaajat ovien päälle
   * laita pelaajat avaamaan ovet
 
+## Level 3
+
+Seuraava komento avaa pelin toisen tason:
+
+```bash
+poetry run invoke level3
+```
+
+Tason muokattava koodi löytyy osoitteesta /spaghetti/src/level_3.py
+
+Tasolla ovat käytettävisä seuraavat metodikutsut:
+* 'players' listan sisällä ovat alla olevat metodikutsut. jokainen elementti listassa on yksittäinen Player olio.
+    * move_player_down() - liikuttaa pelaaja yhden ruudun alaspäin
+    * move_player_up() - liikuttaa pelaajaa yhden ruudun ylöspäin
+    * move_player_left() - liikuttaa pelaajaa yhden ruudun vasemmalle
+    * move_player_right() - liikuttaa pelaajaa yhden ruudun oikealle
+    * interact() - laita pelaaja tekemään jotain pelimaailmassa
+* run() - käynnistää pelin
+
+
+Tason tehtävä on seuraava:
+  * liikuta kaikki pelaajat ovien päälle
+  * laita pelaajat avaamaan ovet
+
+## Level 4
+
+Seuraava komento avaa pelin toisen tason:
+
+```bash
+poetry run invoke level4
+```
+
+Tason muokattava koodi löytyy osoitteesta /spaghetti/src/level_4.py
+
+Tasolla ovat käytettävisä seuraavat metodikutsut:
+* 'players' listan sisällä ovat alla olevat metodikutsut. jokainen elementti listassa on yksittäinen Player olio.
+    * move_player_down() - liikuttaa pelaaja yhden ruudun alaspäin
+    * move_player_up() - liikuttaa pelaajaa yhden ruudun ylöspäin
+    * move_player_left() - liikuttaa pelaajaa yhden ruudun vasemmalle
+    * move_player_right() - liikuttaa pelaajaa yhden ruudun oikealle
+    * interact() - laita pelaaja tekemään jotain pelimaailmassa
+* run() - käynnistää pelin
+
+
+Tason tehtävä on seuraava:
+  * liikuta kaikki pelaajat oven päälle
+  * laita pelaajat avaamaan ovi
+
 ### Testaus
 
 Testit voi suorittaa seuraavalla kutsulla:
