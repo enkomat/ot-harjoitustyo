@@ -327,7 +327,7 @@ class Util_Level_2:
 
     def player_interact(self, i):
         if self.over_door(i):
-            open_door(i)
+            self.open_door(i)
             self.players[i].has_interacted = True
             self.players[i].draw_player = False
 
