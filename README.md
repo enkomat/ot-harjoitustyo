@@ -159,12 +159,12 @@ Tasolla ovat käytettävisä seuraavat metodikutsut:
 * run() - käynnistää pelin
 
 Tason tehtävä on seuraava:
-  * pelaajia on yhteensä 16. niiden paikka muuttuu satunnaisesti joka kerta kun avaat pelin uudestaan. hae ne 8 pelaajaa jotka ovat lähimpänä ovea.
-  * kuljeta nämä kahdeksan pelaajaa oven läpi. jos yksikin pelaaja joka on liian kaukana ovesta menee siitä läpi, taso epäonnistuu. oven paikka muuttuu satunnaisesti.
+  * pelaajia on yhteensä 16. niiden paikka muuttuu satunnaisesti joka kerta kun avaat pelin uudestaan.
+  * kuljeta kaikki pelaajat oven läpi. oven paikka muuttuu satunnaisesti.
 
 ### Level 7
 
-Tämä taso on haastava. Pelin lähdekoodia ei ikinä tarvitse - eikä saa - muuttaa ratkaistaakseen tehtävää. Myöskään yksityisiin tai suojattuihin muuttujiin ei saa koskea. Tasot pystyy aina selvittämään kyseisen tason julkisilla metodeilla. Voit tosin lisätä mitä tahansa Pipin taikka Pythonin tarjoamia kirjastoja koodiin.
+Tämä taso on huomattavasti haastavampi kuin aiemmat. Pelin lähdekoodia ei kuitenkaan tarvitse muuttaa ratkaistaakseen tehtävää. Tasot pystyy aina selvittämään kyseisen tason julkisilla metodeilla. Voit tosin lisätä mitä tahansa Pipin taikka Pythonin tarjoamia kirjastoja koodiin.
 
 Seuraava komento avaa tason:
 
@@ -190,7 +190,7 @@ Tason tehtävä on seuraava:
   * seuraavaksi vaikea osuus: ryhmät tulee jakaa sillä perusteella, että molemmat vievät mahdollisimman pienen alueen. eli molempien aluuet summattuna yhteen muodostavat pienimmäan mahdollisen numeron. alla vielä pari havainnollistavaa kuvaa oikein jaetuista ryhmistä:
     * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_3.png)
     * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_4.png)
-  * kuljeta kumpikin ryhmä jommasta kummasta ovesta läpi. ovi liittää kunkin sen läpi pelaajan siihen liitettyyn ryhmänumeroon. eli vain saman ryhmän jäseniä saa mennä yhdestä annetusta ovesta läpi, sen jälkeen kun ovi on kertaalleen avattu. taso epäonnistuu jos väärän ryhmän pelaaja menee toiselle ryhmälle varatusta ovesta läpi. (ovien koordinaatit ovat (10, 15) ja (20, 15).)
+  * kuljeta kumpikin ryhmä jommasta kummasta ovesta läpi. ovi liittää kunkin sen läpi pelaajan siihen liitettyyn ryhmänumeroon. eli vain saman ryhmän jäseniä saa mennä yhdestä annetusta ovesta läpi, sen jälkeen kun ovi on kertaalleen avattu. taso epäonnistuu jos väärän ryhmän pelaaja menee toiselle ryhmälle varatusta ovesta läpi. ovien koordinaatit ovat (10, 15) ja (20, 15).
 
 ## Testaus
 
