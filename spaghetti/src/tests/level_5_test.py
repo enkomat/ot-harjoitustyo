@@ -1,4 +1,5 @@
 import unittest
+import math
 import pygame
 from util import Level_5, Util_Level_5, Util
 
@@ -6,7 +7,7 @@ class TestLevel_5(unittest.TestCase):
     def test_solve_level(self):
         for i in range(2): # try twice to be sure
             lvl5 = Level_5()
-            util_lvl_5 = lvl5._Level_5__util_level5
+            util_lvl_5 = lvl5._Level_5__util_level_5
             self.solve_level(lvl5)
             util_lvl_5.run(True)
             for i in range(len(util_lvl_5.players)):

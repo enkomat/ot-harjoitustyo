@@ -1123,8 +1123,7 @@ class Util_Level_7:
         return group     
 
     def dist(self, xy1, xy2):
-        return math.sqrt((xy2[0] - xy1[0])**2 + (xy2[1] - xy1[1])**2)
-
+        return math.sqrt((xy2[0
 
     def draw_ui(self, amt):
         self.util.draw_text('Level_7', 16, 16)
