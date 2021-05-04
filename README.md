@@ -113,7 +113,7 @@ Tämä taso hieman aikaisempia vaikeampi. Pidä mielessä, että kaikki komennot
 Seuraava komento avaa tason:
 
 ```bash
-poetry run invoke level6
+poetry run invoke level5
 ```
 
 Tason muokattava koodi löytyy osoitteesta /spaghetti/src/level_6.py
