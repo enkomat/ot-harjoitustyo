@@ -187,7 +187,7 @@ Tasolla ovat käytettävisä seuraavat metodikutsut:
 
 Tason tehtävä on seuraava:
   * jaa pelaajat kahteen tasan kahdeksan hengen ryhmään. pelaajien paikat muuttuvat aina kun taso avataan uudestaan.
-  * seuraavaksi vaikea osuus: ryhmät ovat salaa jaettu sillä perusteella, että molemmat vievät mahdollisimman pienen alueen. eli molempien aluuet summattuna yhteen muodostavat pienimmäan mahdollisen numeron. sinun pitää koodata tämä salainen algoritmi joka pystyy tekemään jaon oikein, jotta voit tunnistaa pelaajat aina oikeaan ryhmään kuuluvaksi. havainnollistavaa kuvaa oikein jaetuista ryhmistä:
+  * seuraavaksi vaikea osuus: ryhmät ovat salaa jaettu sillä perusteella, että molemmat vievät mahdollisimman pienen alueen. idea on se, että molempien alueet summattuna yhteen muodostavat pienimmäan mahdollisen numeron. sinun pitää koodata tämä salainen algoritmi joka pystyy tekemään jaon oikein, jotta voit tunnistaa pelaajat aina oikeaan ryhmään kuuluvaksi. havainnollistavaa kuvaa oikein jaetuista ryhmistä:
     * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_3.png)
     * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_4.png)
   * kuljeta kumpikin ryhmä jommasta kummasta ovesta läpi. ensimmäinen pelaaja joka sen läpi kulkee, liittää sen siihen ryhmään johon pelaaja kuuluu. taso epäonnistuu jos väärän ryhmän pelaaja menee toiselle ryhmälle varatusta ovesta läpi. eli vain ryhmä ykkösen pelaajia tietystä ovesta ja ryhmä kakkosen pelaajia tietystä ovesta. ovien paikat eivät muutu. ovien koordinaatit ovat (10, 15) ja (20, 15).
