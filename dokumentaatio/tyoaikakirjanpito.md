@@ -18,3 +18,6 @@
 | 24.4. | 1   | pelin laittamaista toimimaan etätyöpöydällä, refaktorointia |
 | 26.4. | 2   | refaktorointia |
 | 27.4. | 6   | refaktorointia, testien toimimaan laittaminen, uusien testien kirjoittaminen, sekvenssikaavio |
+| 3.5. | 4   | uusien levelien luontia |
+| 4.5. | 8   | uusien levelien luontia, säätöä seiskatason kanssa. uusien testien kirjoittaminen. pariin luokkaan docstringit. |
+
