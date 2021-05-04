@@ -8,11 +8,11 @@ class TestLevel_7(unittest.TestCase):
         for i in range(3): # try thrice to be sure
             lvl7 = Level_7()
             util_lvl_7 = lvl7._Level_7__util_level_7
-            self.solve_level(lvl7)
+            self.solve_level(lvl7, util_lvl_7)
             util_lvl_7.run(True)
             self.assertEqual(util_lvl_7.level_failed, False)
 
-    def solve_level(self, lvl7):
+    def solve_level(self, lvl7, util):
         # get biggest distance between two players
         biggest_dist = 0
         leader1 = lvl7.players[0]
@@ -23,7 +23,7 @@ class TestLevel_7(unittest.TestCase):
                 if player1 == player2:
                     continue
                 player2_xy = [player2.get_position_x(), player2.get_position_y()]
-                dist = math.dist(player1_xy, player2_xy)
+                dist = util.dist(player1_xy, player2_xy)
                 if(dist > biggest_dist):
                     biggest_dist = dist
                     leader1 = player1
@@ -38,7 +38,7 @@ class TestLevel_7(unittest.TestCase):
                 continue
 
             player_xy = [player.get_position_x(), player.get_position_y()]
-            dist = math.dist(leader1_xy, player_xy)
+            dist = util.dist(leader1_xy, player_xy)
             distances.append(dist)
             players_grp1.append(player)
 

@@ -1096,7 +1096,7 @@ class Util_Level_7:
                 if player1 == player2:
                     continue
                 player2_xy = [player2.get_position_x(), player2.get_position_y()]
-                dist = math.dist(player1_xy, player2_xy)
+                dist = self.dist(player1_xy, player2_xy)
                 if(dist > biggest_dist):
                     biggest_dist = dist
                     leader1 = player1
@@ -1109,7 +1109,7 @@ class Util_Level_7:
             if player == leader1:
                 continue
             player_xy = [player.get_position_x(), player.get_position_y()]
-            dist = math.dist(leader1_xy, player_xy)
+            dist = self.dist(leader1_xy, player_xy)
             distances.append(dist)
             players_grp1.append(player)
 
@@ -1121,6 +1121,10 @@ class Util_Level_7:
             group.append(sorted_players[i][1])
         
         return group     
+
+    def dist(self, xy1, xy2):
+        return math.sqrt((xy2[0] - xy1[0])**2 + (xy2[1] - xy1[1])**2)
+
 
     def draw_ui(self, amt):
         self.util.draw_text('Level_7', 16, 16)
