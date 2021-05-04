@@ -116,7 +116,7 @@ Seuraava komento avaa tason:
 poetry run invoke level5
 ```
 
-Tason muokattava koodi löytyy osoitteesta /spaghetti/src/level_6.py
+Tason muokattava koodi löytyy osoitteesta /spaghetti/src/level_5.py
 
 Tasolla ovat käytettävisä seuraavat metodikutsut:
 * 'players' listan sisällä ovat alla olevat metodikutsut. jokainen elementti listassa on yksittäinen Player_2 olio.
