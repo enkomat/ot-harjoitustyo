@@ -11,8 +11,8 @@ class TestLevel_5(unittest.TestCase):
             self.solve_level(lvl5)
             util_lvl_5.run(True)
             for i in range(len(util_lvl_5.players)):
-                self.assertEqual(util_lvl_5.players[i].position_x, 15)
-                self.assertEqual(util_lvl_5.players[i].position_y, 15)
+                self.assertEqual(util_lvl_5.players[i].get_position_x(), 15)
+                self.assertEqual(util_lvl_5.players[i].get_position_y(), 15)
 
     def solve_level(self, lvl5):
         for player in lvl5.players:
