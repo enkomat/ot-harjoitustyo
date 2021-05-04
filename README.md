@@ -188,8 +188,8 @@ Tasolla ovat käytettävisä seuraavat metodikutsut:
 Tason tehtävä on seuraava:
   * jaa pelaajat kahteen tasan kahdeksan hengen ryhmään.
   * seuraavaksi vaikea osuus: ryhmät tulee jakaa sillä perusteella, että molemmat vievät mahdollisimman pienen alueen. eli molempien aluuet summattuna yhteen muodostavat pienimmäan mahdollisen numeron. alla vielä pari havainnollistavaa kuvaa oikein jaetuista ryhmistä:
-    * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_1.png)
-    * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_2.png)
+    * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_3.png)
+    * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_4.png)
   * kuljeta kumpikin ryhmä jommasta kummasta ovesta läpi. ovi liittää kunkin sen läpi pelaajan siihen liitettyyn ryhmänumeroon. eli vain saman ryhmän jäseniä saa mennä yhdestä annetusta ovesta läpi, sen jälkeen kun ovi on kertaalleen avattu. taso epäonnistuu jos väärän ryhmän pelaaja menee toiselle ryhmälle varatusta ovesta läpi. (ovien koordinaatit ovat (10, 15) ja (20, 15).)
 
 ## Testaus
