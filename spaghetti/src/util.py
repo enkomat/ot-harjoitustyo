@@ -4,6 +4,24 @@ import random
 import math
 
 class Util:
+    """Hallinnoi pelin ja pelimoottorin kaikki perustoiminnallisuuksia. Jokaisen tason luokasta referoidaan tätä luokkaa perustoiminallisuuksia varten.
+
+    Attributes:
+        width = peli-ikkunan leveys
+        height = peli-ikkunan korkeus
+        window = referenssi pygamen avulla luotuun peli-ikkunaan
+        font = pelin perusfontti
+        font_level_solved = isompi fontti joka näkyy kun taso ratkaistaan tai hävitään
+        font_playable = pelin kartan sisään piirrettävä fontti, mahdollista tulevaa tasoa varten
+        path = reitti pelin hakemistoon
+        tile_pixel_size = yhden pelipalikan koko kartalla, pikseleissä
+        map_tiles = kartalla olevat 1024 palikkaa, eli 32*32 kokoinen kartta
+        background_color = oletustaustaväri, joka ei pitäisi olla näkyvillä kun renderöinti onnistuu
+        image_tiles = kaikki pelin grafiikat tässä listassa, joka koostuu spriteistä
+        event_list = pelimoottori kerää kaikki pelaajan koodaamat metodikutsut tähän listaan, ja suorittaa ne kun peli lähtee pyörimään
+        event_parameter_list = tähän listaan voi syöttää mahdollisia parametreja tiettyyn metodikutsuun joka tulee pelaajan koodista
+        fps = pelin frames per second
+    """
     def __init__(self):
         pygame.init()
         self.width = 8*64
@@ -29,6 +47,8 @@ class Util:
         self.fps = 60
 
     def load_tile_images(self):
+        """Ladataan kaikki pelin grafiikat assets kansiosta image_tiles listaan ja järjestetään ne oikeaan järjestykseen.
+        """
         i = 0
         asset_path = os.path.dirname(os.path.realpath(__file__)) + "/assets/"
         for filename in sorted(os.listdir(asset_path)):
@@ -39,15 +59,26 @@ class Util:
                 self.image_tiles.append(new_bmp)
 
     def draw_text(self, text, x, y):
+        """Piirtää tekstiä Pygamen avulla mihin tahansa peli-ikkunaan.
+
+        Args:
+            text (str): Teksti joka piirretään
+            x (int): Tekstin x kohta pikseleissä
+            y (int): Tekstin y kohta pikseleissä
+        """
         text_surface = self.font.render(text, False, (255, 255, 255))
         self.window.blit(text_surface, (x, y))
 
     def draw_text_level_solved(self):
+        """Piirtää tekstin kun tietty taso on selvitetty.
+        """
         text_surface = self.font_level_solved.render(
             'LEVEL SOLVED! :)', False, (255, 255, 255))
         self.window.blit(text_surface, (128, 256))
 
     def draw_text_level_failed(self):
+        """Piirtää tekstin kun jokin taso on hävitty.
+        """
         text_surface = self.font_level_solved.render(
             'level failed... :(', False, (255, 255, 255))
         self.window.blit(text_surface, (128, 256))
@@ -57,6 +88,8 @@ class Util:
         self.window.blit(text_surface, (x, y))
 
     def draw_coords(self):
+        """Piirtää koordinaatit numeroina pelin kartan reunoille, jotta pelaajan on helpompi hahmottaa missä elementit ovat.
+        """
         x = 0
         y = 64
         for i in range(32):
@@ -68,28 +101,57 @@ class Util:
             y += 16
 
     def draw_player(self, x, y):
+        """Piirtää yhden pelaajan.
+
+        Args:
+            x (int): Pelaajan kohta kartalla (ei pikseleissä) x suunnassa.
+            y (int): Pelaajan kohta kartalla (ei pikseleissä) y suunnassa.
+        """
         x *= self.tile_pixel_size
         y *= self.tile_pixel_size
         y += 64
         self.window.blit(self.image_tiles[6], (x, y))
 
     def draw_closed_door(self, x, y):
+        """Piirtää suljetun oven.
+
+        Args:
+            x (int): Oven kohta kartalla (ei pikseleissä) x suunnassa.
+            y (int): Oven kohta kartalla (ei pikseleissä) y suunnassa.
+        """
         x *= self.tile_pixel_size
         y *= self.tile_pixel_size
         y += 64
         self.window.blit(self.image_tiles[32], (x, y))
 
     def draw_open_door(self, x, y):
+        """Piirtää avoimen oven.
+
+        Args:
+            x (int): Oven kohta kartalla (ei pikseleissä) x suunnassa.
+            y (int): Oven kohta kartalla (ei pikseleissä) y suunnassa.
+        """
         x *= self.tile_pixel_size
         y *= self.tile_pixel_size
         y += 64
         self.window.blit(self.image_tiles[33], (x, y))
 
     def add_to_event_list(self, method_to_add):
+        """Lisää tietyn parametrittoman metodikutsun suoritettavien metodien listaan, eli event_list listaan.
+
+        Args:
+            method_to_add (metodikutsu): Mikä tahansa parametriton metodi joka halutaan lisätä suoritettavien metodien listaan.
+        """
         self.event_list.append(method_to_add)
         self.event_parameter_list.append(None)
 
     def add_to_event_list_with_parameter(self, method_to_add, parameter):
+        """Lisää tietyn metodikutsun suoritettavien metodien listaan, eli event_list listaan.
+
+        Args:
+            method_to_add (metodikutsu): Mikä tahansa metodi joka halutaan lisätä suoritettavien metodien listaan.
+            parameter (metodikutsun parametrin): Aiemman metodin parametri jota tarvitaan.
+        """
         self.event_list.append(method_to_add)
         self.event_parameter_list.append(parameter)
 
@@ -97,6 +159,8 @@ class Util:
         return self.event_list
 
     def execute_next_method_in_event_list(self):
+        """Suorittaa seuraavan metodin pelin aikana suoritettavien metodien listasta.
+        """
         parameter = self.event_parameter_list.pop(0)
         if parameter is None:
             self.event_list.pop(0)()
@@ -104,9 +168,13 @@ class Util:
             self.event_list.pop(0)(parameter)
 
     def quit(self):
+        """Sulkee pelin.
+        """
         pygame.quit()
 
 class Door_Util:
+    """Luo oven johon pelaajalla ei tarvetta koskea.
+    """
     def __init__(self, position_x, position_y):
         self.position_x = position_x
         self.position_y = position_y
@@ -114,6 +182,8 @@ class Door_Util:
         self.group_index = 0
 
 class Door:
+    """Luo oven jonka paikan pelaaja voi hakea.
+    """
     def __init__(self, position_x, position_y):
         self.__position_x = position_x
         self.__position_y = position_y
@@ -126,6 +196,14 @@ class Door:
         return self.__position_y
 
 class Util_Level_1:
+    """Pelin ensimmäisen tason työkalupakettiluokka.
+
+    Attributes:
+        util = Util olio
+        player_position_x = pelaajan paikka kartalla x suunnassa
+        player_position_y = pelaajan paikka kartalla y suunnassa
+        door = tason ovi ja sen paikka parametreina konstruktorille
+    """
     def __init__(self, player_x=1, player_y=1):
         self.util = Util()
         self.player_position_x = player_x
@@ -134,32 +212,52 @@ class Util_Level_1:
         self.event_list = self.util.event_list
 
     def move_player_left(self):
+        """Liikuttaa pelaajaa yhden ruudun vasemmalle.
+        """
         self.player_position_x -= 1
         self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def move_player_right(self):
+        """Liikuttaa pelaajaa yhden ruudun oikealle.
+        """
         self.player_position_x += 1
         self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def move_player_up(self):
+        """Liikuttaa pelaajaa yhden ruudun ylöspäin.
+        """
         self.player_position_y -= 1
         self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def move_player_down(self):
+        """Liikuttaa pelaajaa yhden ruudun alaspäin.
+        """
         self.player_position_y += 1
         self.util.draw_player(self.player_position_x, self.player_position_y)
 
     def player_interact(self):
+        """Laittaa pelaajan avaamaan oven, jos se on sen päällä. Jos pelaaja onnistuu avaamaan oven, päivitetään ovi avonaiseksi.
+
+        Returns:
+            bool: Palauttaa onko pelaaja avannut oven onnistuneesti.
+        """
         if self.player_position_x == self.door.position_x and self.player_position_y == self.door.position_y:
             self.door.is_open = True
             return True
         return False
 
     def draw_ui(self, amt):
+        """Piirtää tason tekstikäyttöliittymän peli-ikkunan yläosaan.
+
+        Args:
+            amt (int): Pelaajan lähettämien metodikutsujen määrä.
+        """
         self.util.draw_text('Level_1', 16, 16)
         self.util.draw_text('call_amount=' + str(amt) + '/59', 16, 32)
 
     def draw_map(self):
+        """Piirtää tason kartan
+        """
         self.util.window.fill(self.util.background_color)
         x = 0
         y = 64
@@ -171,6 +269,12 @@ class Util_Level_1:
                 y += self.util.tile_pixel_size
 
     def run(self, is_test=False):
+        """Ensimmäisen tason gameplay luuppi. 
+        Päivittää kaikki pelin tapahtumat ja käy läpi pelaajan lähettämät metodikutsut järjestyksessä, kunnes niitä ei enää ole.
+
+        Args:
+            is_test (bool, optional): Vaihdetaan arvoksi True jos halutaan pyörittää testitilassa. Defaults to False.
+        """
         event_execution_amount = 0
         self.util.load_tile_images()
         self.clock = pygame.time.Clock()
@@ -214,28 +318,44 @@ class Util_Level_1:
         pygame.quit()
 
 class Level_1:
+    """Pelaajalle avoinna oleva luokka jonka kautta kutsutaan tason ratkaisemiseen tarkoitettuja metodeja.
+    """
     def __init__(self):
         self.__util_level_1 = Util_Level_1()
 
     def move_player_left(self):
+        """Lisää alkuperäisen move_player_left metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
+        """
         self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_left)
 
     def move_player_right(self):
+        """Lisää alkuperäisen move_player_right metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
+        """
         self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_right)
 
     def move_player_up(self):
+        """Lisää alkuperäisen move_player_up metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
+        """
         self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_up)
 
     def move_player_down(self):
+        """Lisää alkuperäisen move_player_down metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
+        """
         self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_down)
 
     def player_interact(self):
+        """Lisää alkuperäisen player_interact metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
+        """
         self.__util_level_1.util.add_to_event_list(self.__util_level_1.player_interact)
 
     def run(self):
+        """Laittaa pelin pyörimään. Poistaa pelaajalta mahdollisuuden suorittaa peliluuppi testimoodissa.
+        """
         self.__util_level_1.run()
 
 class Player:
+    """Myöhemmissä tasoissa käytetty luokka, joka mahdollistaa sen, että tasoa ratkottaesta voi ohjata useampaa pelaajaa.
+    """
     def __init__(self, index, util):
         self.__index = index
         self.__util = util
@@ -261,6 +381,14 @@ class Player:
             self.__util.player_interact, self.__index)
 
 class Player_Util:
+    """Myöhemmissä tasoissa käytetty luokka, joka mahdollistaa useamman pelaajan olemassaolon ja niiden piirtämisen.
+
+    Attributes:
+        position_x: pelaajan paikka kartalla x suunnassa.
+        position_y: pelaajan paikka kartalla y suunnassa.
+        has_interacted: pitää muistissa onko pelaaja mennyt oven läpi tai tehnyt jotain muuta.
+        draw_player: pitää muistissa sen, halutaanko pelaaja piirtää kartalle vai ei
+    """
     def __init__(self, position_x, position_y):
         self.position_x = position_x
         self.position_y = position_y
@@ -268,6 +396,12 @@ class Player_Util:
         self.draw_player = True
 
 class Util_Level_2:
+    """Toisen tason työkalupakkiluokka.
+
+    Attributes:
+        players: kaikki pelaajat listassa
+        doors: kaikki ovet listassa
+    """
     def __init__(self):
         self.util = Util()
 
@@ -409,6 +543,8 @@ class Util_Level_2:
         pygame.quit()
 
 class Level_2:
+    """Toisen tason ratkomiseen tarkoitettu luokka.
+    """
     def __init__(self, players = []):
         self.__util_level_2 = Util_Level_2()
         self.__p1 = Player(0, self.__util_level_2)
