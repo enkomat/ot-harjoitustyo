@@ -956,24 +956,24 @@ class Util_Level_6:
                 self.util.draw_closed_door(self.door.position_x, self.door.position_y)
 
     def move_player_up(self, i):
-        self.players[i].position_y -= 1
+        self.players[i]._Player_2__position_y -= 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
+            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
 
     def move_player_down(self, i):
-        self.players[i].position_y += 1
+        self.players[i]._Player_2__position_y += 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
+            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
 
     def move_player_left(self, i):
-        self.players[i].position_x -= 1
+        self.players[i]._Player_2__position_x -= 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
+            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
 
     def move_player_right(self, i):
-        self.players[i].position_x += 1
+        self.players[i]._Player_2__position_x += 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
+            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
 
     def player_interact(self, i):
         if self.over_goal(i):
@@ -982,7 +982,7 @@ class Util_Level_6:
             self.players[i]._Player_2__draw_player = False
 
     def over_goal(self, i):
-        if (self.door.position_x == self.players[i].position_x) and (self.door.position_y == self.players[i].position_y):
+        if (self.door.position_x == self.players[i]._Player_2__position_x) and (self.door.position_y == self.players[i]._Player_2__position_y):
             return True
         return False
 
@@ -1021,7 +1021,7 @@ class Util_Level_6:
             self.draw_ui(event_execution_amount)
             for player in self.players:
                 if player._Player_2__draw_player:
-                    self.util.draw_player(player.position_x, player.position_y)
+                    self.util.draw_player(player._Player_2__position_x, player._Player_2__position_y)
             if self.level_has_been_solved():
                 self.util.draw_text_level_solved()
             pygame.display.update()
@@ -1043,8 +1043,9 @@ class Util_Level_7:
         
         self.random_positions = []
         for i in range(16):
-            x = random.choice([i for i in range(1,30) if i not in [10, 20]])
-            y = random.choice([i for i in range(1,30) if i not in [15]])
+            # create a spawner that can not spawn players on top of each other
+            x = random.choice([i for i in range(1,31) if i not in [10, 20]])
+            y = random.choice([i for i in range(1,31) if i not in [15]])
             self.random_positions.append((x, y))
 
         self.__p1 = Player_2(0, self, 1, self.random_positions[0][0], self.random_positions[0][1])
@@ -1066,26 +1067,52 @@ class Util_Level_7:
         self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
                self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
 
+        group1 = self.create_player_group(self.players)
+        
+        for player in self.players:
+            if player in group1:
+                player._Player_2__group_index = 2
+
         self.door_1 = Door_Util(10, 15)
         self.door_2 = Door_Util(20, 15)
 
         self.doors = [self.door_1, self.door_2]
 
-    def create_player_group(players, group_size):
-        addable_players = []
-        addable_players.extend(players)
-        group = []
-        distances = []
-
+    def create_player_group(self, players):
+        biggest_dist = 0
+        leader1 = players[0]
+        leader2 = players[0]
         for player1 in players:
-            for player2 in addable_players:
+            player1_xy = [player1.get_position_x(), player1.get_position_y()]
+            for player2 in players:
                 if player1 == player2:
                     continue
+                player2_xy = [player2.get_position_x(), player2.get_position_y()]
+                dist = math.dist(player1_xy, player2_xy)
+                if(dist > biggest_dist):
+                    biggest_dist = dist
+                    leader1 = player1
+                    leader2 = player2
 
-                dist = math.hypot(position2[0] - position1[0], position2[1] - position1[1])
-                distances.append(dist)
+        leader1_xy = [leader1.get_position_x(), leader1.get_position_y()]
+        distances = []
+        players_grp1 = []
+        for player in players:
+            if player == leader1:
+                continue
+            player_xy = [player.get_position_x(), player.get_position_y()]
+            dist = math.dist(leader1_xy, player_xy)
+            distances.append(dist)
+            players_grp1.append(player)
+
+        zipped_pairs = zip(distances, players_grp1)
+        sorted_players = sorted(zipped_pairs, key = lambda x: x[0])
+
+        group = [leader1]
+        for i in range(7):
+            group.append(sorted_players[i][1])
         
-        distances.sort()
+        return group     
 
     def draw_ui(self, amt):
         self.util.draw_text('Level_6', 16, 16)
@@ -1101,40 +1128,40 @@ class Util_Level_7:
             if x >= self.util.width:
                 x = 0
                 y += self.util.tile_pixel_size
-            for door in doors:
+            for door in self.doors:
                 if door.is_open:
                     self.util.draw_open_door(door.position_x, door.position_y)
                 else:
                     self.util.draw_closed_door(door.position_x, door.position_y)
 
     def move_player_up(self, i):
-        self.players[i].position_y -= 1
+        self.players[i]._Player_2__position_y -= 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
+            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
 
     def move_player_down(self, i):
-        self.players[i].position_y += 1
+        self.players[i]._Player_2__position_y += 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
+            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
 
     def move_player_left(self, i):
-        self.players[i].position_x -= 1
+        self.players[i]._Player_2__position_x -= 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
+            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
 
     def move_player_right(self, i):
-        self.players[i].position_x += 1
+        self.players[i]._Player_2__position_x += 1
         self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
+            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
 
     def player_interact(self, i):
         if self.over_goal(i):
-            self.door.is_open = True
+            self.doors[0].is_open = True
             self.players[i]._Player_2__has_interacted = True
             self.players[i]._Player_2__draw_player = False
 
     def over_goal(self, i):
-        if (self.door.position_x == self.players[i].position_x) and (self.door.position_y == self.players[i].position_y):
+        if (self.doors[0].position_x == self.players[i]._Player_2__position_x) and (self.doors[0].position_y == self.players[i]._Player_2__position_y):
             return True
         return False
 
@@ -1173,7 +1200,7 @@ class Util_Level_7:
             self.draw_ui(event_execution_amount)
             for player in self.players:
                 if player._Player_2__draw_player:
-                    self.util.draw_player(player.position_x, player.position_y)
+                    self.util.draw_player(player._Player_2__position_x, player._Player_2__position_y)
             if self.level_has_been_solved():
                 self.util.draw_text_level_solved()
             pygame.display.update()
@@ -1182,11 +1209,11 @@ class Util_Level_7:
 
 class Level_7:
     def __init__(self, players = []):
-        self.__util_level_6 = Util_Level_6()
-        self.players = self.__util_level_6.players
+        self.__util_level_7 = Util_Level_7()
+        self.players = self.__util_level_7.players
 
     def run(self):
-        self.__util_level_6.run()
+        self.__util_level_7.run()
 
 class Letter:
     def __init__(self, util, index):

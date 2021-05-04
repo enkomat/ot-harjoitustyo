@@ -164,7 +164,7 @@ Tason tehtävä on seuraava:
 
 ### Level 7
 
-Tämä tasa on haastava. Pelin lähdekoodia ei ikinä tarvitse - eikä saa - muuttaa ratkaistaakseen tehtävää. Myöskään yksityisiin tai suojattuihin muuttujiin ei saa koskea. Tasot pystyy aina selvittämään kyseisen tason julkisilla metodeilla sekä muuttujilla. Voit tosin lisätä mitä tahansa omia taikka Pythonin tarjoamia kirjastoja koodiin.
+Tämä taso on haastava. Pelin lähdekoodia ei ikinä tarvitse - eikä saa - muuttaa ratkaistaakseen tehtävää. Myöskään yksityisiin tai suojattuihin muuttujiin ei saa koskea. Tasot pystyy aina selvittämään kyseisen tason julkisilla metodeilla. Voit tosin lisätä mitä tahansa Pipin taikka Pythonin tarjoamia kirjastoja koodiin.
 
 Seuraava komento avaa tason:
 
@@ -176,20 +176,21 @@ Tason muokattava koodi löytyy osoitteesta /spaghetti/src/level_7.py
 
 Tasolla ovat käytettävisä seuraavat metodikutsut:
 * 'players' listan sisällä ovat alla olevat metodikutsut. jokainen elementti listassa on yksittäinen Player_2 olio.
-    * move_player_down() - liikuttaa pelaaja yhden ruudun alaspäin
-    * move_player_up() - liikuttaa pelaajaa yhden ruudun ylöspäin
-    * move_player_left() - liikuttaa pelaajaa yhden ruudun vasemmalle
-    * move_player_right() - liikuttaa pelaajaa yhden ruudun oikealle 
-    * position_x - muuttuja joka sisältää pelaajan paikan x. x on sivuttainen suunta, vasemmalta oikealle.
-    * position_y - muuttuja joka sisältää pelaajan paikan y. y on vertikaalinen suunta, ylhäältä alas.
+    * move_down() - liikuttaa pelaaja yhden ruudun alaspäin
+    * move_up() - liikuttaa pelaajaa yhden ruudun ylöspäin
+    * move_left() - liikuttaa pelaajaa yhden ruudun vasemmalle
+    * move_right() - liikuttaa pelaajaa yhden ruudun oikealle 
+    * get_position_x - palauttaa pelaajan paikan x. x on sivuttainen suunta, vasemmalta oikealle.
+    * get_position_y - palauttaa pelaajan paikan y. y on vertikaalinen suunta, ylhäältä alas.
     * interact() - laita pelaaja tekemään jotain pelimaailmassa
 * run() - käynnistää pelin
 
-
 Tason tehtävä on seuraava:
   * jaa pelaajat kahteen tasan kahdeksan hengen ryhmään.
-  * jaa ryhmät sen perusteella ketkä pelaajat ovat lähimpänä toisiaan. jos pelaaja on yhtä lähellä kahta ryhmää, jaa se siihen ryhmään mihin mahtuu. pelaajien paikat ovat satunnaiset, eli ne muuttuvat joka kerta kun avaat tason uudestaan.
-  * kuljeta kukin ryhmä samasta ovesta läpi. ovi liittää kunkin sen läpi pelaajan siihen liitettyyn ryhmänumeroon. eli vain saman ryhmän jäseniä saa mennä siitä läpi, sen jälkeen kun ovi on kertaalleen avattu.
+  * seuraavaksi vaikea osuus: ryhmät tulee jakaa sillä perusteella, että molemmat vievät mahdollisimman pienen alueen. eli molempien aluuet summattuna yhteen muodostavat pienimmäan mahdollisen numeron. alla vielä pari havainnollistavaa kuvaa oikein jaetuista ryhmistä:
+    * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_1.png)
+    * ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level7_2.png)
+  * kuljeta kumpikin ryhmä jommasta kummasta ovesta läpi. ovi liittää kunkin sen läpi pelaajan siihen liitettyyn ryhmänumeroon. eli vain saman ryhmän jäseniä saa mennä yhdestä annetusta ovesta läpi, sen jälkeen kun ovi on kertaalleen avattu. taso epäonnistuu jos väärän ryhmän pelaaja menee toiselle ryhmälle varatusta ovesta läpi. (ovien koordinaatit ovat (10, 15) ja (20, 15).)
 
 ## Testaus
 
