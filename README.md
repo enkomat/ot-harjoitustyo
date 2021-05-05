@@ -164,7 +164,7 @@ Tason tehtävä on seuraava:
 
 ### Level 7
 
-Tämä taso on huomattavasti haastavampi kuin aiemmat. Pelin lähdekoodia ei kuitenkaan tarvitse muuttaa ratkaistaakseen tehtävää. Tasot pystyy aina selvittämään kyseisen tason julkisilla metodeilla. Voit tosin lisätä mitä tahansa Pipin taikka Pythonin tarjoamia kirjastoja koodiin.
+Tämän tason algoritmi ei vielä toimi 100% varmuudella, joten jos tuntuu siltä että ei mene läpi vaikka pitäisi niin probleema voi olla myös kehittelemäni algoritmin päädyssä. Yritän korjata asian mahdollisimman nopeasti. Tämä taso on myös huomattavasti haastavampi kuin aiemmat. Pelin lähdekoodia ei kuitenkaan tarvitse muuttaa ratkaistaakseen tehtävää. Tasot pystyy aina selvittämään kyseisen tason julkisilla metodeilla. Voit tosin lisätä mitä tahansa Pipin taikka Pythonin tarjoamia kirjastoja koodiin.
 
 Seuraava komento avaa tason:
 
