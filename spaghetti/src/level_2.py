@@ -5,8 +5,6 @@ lvl2 = Level_2()
 # write your solution between the lines below
 # -------------------------------------
 
-
-
 # -------------------------------------
 
 lvl2.run()  # always call run method last

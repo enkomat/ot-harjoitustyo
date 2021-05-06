@@ -2,6 +2,17 @@ import pygame
 import os
 import random
 import math
+from pymitter import EventEmitter
+
+global event_emitter
+event_emitter = EventEmitter()
+
+class Image_Tile:
+    def __init__(self, util):
+        self.player = util.image_tiles[6]
+        self.closed_door = util.image_tiles[32]
+        self.open_door = util.image_tiles[33]
+        self.background = util.image_tiles[15]
 
 class Util:
     """Hallinnoi pelin ja pelimoottorin kaikki perustoiminnallisuuksia. Jokaisen tason luokasta referoidaan tätä luokkaa perustoiminallisuuksia varten.
@@ -24,10 +35,12 @@ class Util:
     """
     def __init__(self):
         pygame.init()
+        
         self.width = 8*64
         self.height = 9*64
         self.window = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("spaghetti")
+        
         pygame.font.init()
         self.font = pygame.font.SysFont('Arial', 12)
         self.font_level_solved = pygame.font.SysFont('ComicSans MS', 32)
@@ -35,17 +48,18 @@ class Util:
 
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.tile_pixel_size = 16
-        self.map_tiles = [pygame.image.load(
-            self.path + "/assets/colored_tilemap_packed_140.bmp")] * 1024
         self.background_color = (0, 0, 0)  # change from black to more grey
 
         self.image_tiles = []
+        self.tile = None
 
         self.event_list = []
         self.event_parameter_list = []
+        self.time_since_last_event_list_execute = 0.0
+        self.event_execution_amount = 0
 
         self.fps = 60
-
+    
     def load_tile_images(self):
         """Ladataan kaikki pelin grafiikat assets kansiosta image_tiles listaan ja järjestetään ne oikeaan järjestykseen.
         """
@@ -57,6 +71,10 @@ class Util:
                 new_bmp = pygame.image.load(path)
                 new_bmp.convert()
                 self.image_tiles.append(new_bmp)
+        
+        self.tile = Image_Tile(self) # create this object only after the tiles have been loaded
+
+    # drawing related functions:
 
     def draw_text(self, text, x, y):
         """Piirtää tekstiä Pygamen avulla mihin tahansa peli-ikkunaan.
@@ -83,10 +101,6 @@ class Util:
             'level failed... :(', False, (255, 255, 255))
         self.window.blit(text_surface, (128, 256))
 
-    def draw_text_playable(self, text, x, y):
-        text_surface = self.font_playable.render(text, False, (255, 255, 255))
-        self.window.blit(text_surface, (x, y))
-
     def draw_coords(self):
         """Piirtää koordinaatit numeroina pelin kartan reunoille, jotta pelaajan on helpompi hahmottaa missä elementit ovat.
         """
@@ -100,31 +114,7 @@ class Util:
             self.draw_text(str(i), x, y)
             y += 16
 
-    def draw_player(self, x, y):
-        """Piirtää yhden pelaajan.
-
-        Args:
-            x (int): Pelaajan kohta kartalla (ei pikseleissä) x suunnassa.
-            y (int): Pelaajan kohta kartalla (ei pikseleissä) y suunnassa.
-        """
-        x *= self.tile_pixel_size
-        y *= self.tile_pixel_size
-        y += 64
-        self.window.blit(self.image_tiles[6], (x, y))
-
-    def draw_closed_door(self, x, y):
-        """Piirtää suljetun oven.
-
-        Args:
-            x (int): Oven kohta kartalla (ei pikseleissä) x suunnassa.
-            y (int): Oven kohta kartalla (ei pikseleissä) y suunnassa.
-        """
-        x *= self.tile_pixel_size
-        y *= self.tile_pixel_size
-        y += 64
-        self.window.blit(self.image_tiles[32], (x, y))
-
-    def draw_open_door(self, x, y):
+    def draw_tile(self, tile, x, y):
         """Piirtää avoimen oven.
 
         Args:
@@ -134,52 +124,169 @@ class Util:
         x *= self.tile_pixel_size
         y *= self.tile_pixel_size
         y += 64
-        self.window.blit(self.image_tiles[33], (x, y))
+        self.window.blit(tile, (x, y))
 
-    def add_to_event_list(self, method_to_add):
-        """Lisää tietyn parametrittoman metodikutsun suoritettavien metodien listaan, eli event_list listaan.
+    def draw_ui(self, amt, level_name):
+        self.draw_text(level_name, 16, 16)
+        self.draw_text('call_amount=' + str(amt), 16, 32)
 
-        Args:
-            method_to_add (metodikutsu): Mikä tahansa parametriton metodi joka halutaan lisätä suoritettavien metodien listaan.
+    def draw_map(self, level_util):
+        self.window.fill(self.background_color)
+        self.draw_background_tiles()
+        self.draw_doors(level_util)
+        self.draw_players(level_util)
+
+    def draw_background_tiles(self):
+        for x in range(32):
+            for y in range(32):
+                self.draw_tile(self.tile.background, x, y)
+
+    def draw_doors(self, level_util):
+        for door in level_util.doors:
+            if door._Door__is_open:
+                self.draw_tile(self.tile.open_door, door._Door__position_x, door._Door__position_y)
+            else:
+                self.draw_tile(self.tile.closed_door, door._Door__position_x, door._Door__position_y)
+    
+    def draw_players(self, level_util):
+        for player in level_util.players:
+            if player._Player__draw_player:
+                self.draw_tile(self.tile.player, player._Player__position_x, player._Player__position_y)
+
+    # current events:
+
+    @event_emitter.on("move_player_left")
+    def move_player_left(self, player):
+        """Liikuttaa pelaajaa yhden ruudun vasemmalle.
         """
-        self.event_list.append(method_to_add)
-        self.event_parameter_list.append(None)
+        player._Player__position_x -= 1
 
-    def add_to_event_list_with_parameter(self, method_to_add, parameter):
+    @event_emitter.on("move_player_right")
+    def move_player_right(self, player):
+        """Liikuttaa pelaajaa yhden ruudun oikealle.
+        """
+        player._Player__position_x += 1
+
+    @event_emitter.on("move_player_up")
+    def move_player_up(self, player):
+        """Liikuttaa pelaajaa yhden ruudun ylöspäin.
+        """
+        player._Player__position_y -= 1
+
+    @event_emitter.on("move_player_down")
+    def move_player_down(self, player):
+        """Liikuttaa pelaajaa yhden ruudun alaspäin.
+        """
+        player._Player__position_y += 1
+    
+    @event_emitter.on("player_interact")
+    def player_interact(self, player):
+        """Laittaa pelaajan avaamaan oven, jos se on sen päällä. Jos pelaaja onnistuu avaamaan oven, päivitetään ovi avonaiseksi.
+
+        Returns:
+            bool: Palauttaa onko pelaaja avannut oven onnistuneesti.
+        """
+        if player._Player__level_util.interact_condition(player):
+            player._Player__level_util.interact_action(player)
+
+    # interactions with the world:
+
+    def over_door(self, player):
+        for door in player._Player__level_util.doors:
+            if (door._Door__position_x == player._Player__position_x) and (door._Door__position_y == player._Player__position_y):
+                return True
+        return False
+
+    def open_door(self, player):
+        for door in player._Player__level_util.doors:
+            if (door._Door__position_x == player._Player__position_x) and (door._Door__position_y == player._Player__position_y):
+                door._Door__is_open = True
+                player._Player__draw_player = False
+                player._Player__has_interacted = True
+
+    # main game loop and the methods that support it:
+
+    def run(self, level_util, level_name, is_test=False, speed = 2):
+        self.load_tile_images()
+        clock = pygame.time.Clock()
+
+        while self.should_run(is_test):
+            # event execution related methods
+            clock.tick(self.fps)
+            self.time_since_last_event_list_execute += clock.tick(self.fps)
+            self.execute_next_method_in_event_list(speed)
+            
+            # drawing related methods
+            self.draw_map(level_util)
+            self.draw_ui(self.event_execution_amount, level_name)
+            self.draw_coords()
+            if level_util.level_has_been_solved():
+                self.draw_text_level_solved()
+            
+            pygame.display.update()
+
+        # quit game after the game loop has been terminated
+        pygame.quit()
+
+    def should_run(self, is_test):
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+        if is_test and len(self.event_list) == 0:
+            return False
+        return True
+
+    def execute_next_method_in_event_list(self, speed):
+        """Suorittaa seuraavan metodin pelin aikana suoritettavien metodien listasta.
+        """
+        if(len(self.event_list) > 0 and self.time_since_last_event_list_execute > speed):
+            method_parameter = self.event_parameter_list.pop(0)
+            method_name = self.event_list.pop(0)
+            event_emitter.emit(method_name, self, method_parameter)
+            self.event_execution_amount += 1
+            self.time_since_last_event_list_execute = 0
+
+    def add_to_event_list(self, method_name, method_parameter):
         """Lisää tietyn metodikutsun suoritettavien metodien listaan, eli event_list listaan.
 
         Args:
             method_to_add (metodikutsu): Mikä tahansa metodi joka halutaan lisätä suoritettavien metodien listaan.
             parameter (metodikutsun parametrin): Aiemman metodin parametri jota tarvitaan.
         """
-        self.event_list.append(method_to_add)
-        self.event_parameter_list.append(parameter)
+        self.event_list.append(method_name)
+        self.event_parameter_list.append(method_parameter)
 
-    def get_event_list(self):
-        return self.event_list
-
-    def execute_next_method_in_event_list(self):
-        """Suorittaa seuraavan metodin pelin aikana suoritettavien metodien listasta.
-        """
-        parameter = self.event_parameter_list.pop(0)
-        if parameter is None:
-            self.event_list.pop(0)()
-        else:
-            self.event_list.pop(0)(parameter)
-
-    def quit(self):
-        """Sulkee pelin.
-        """
-        pygame.quit()
-
-class Door_Util:
-    """Luo oven johon pelaajalla ei tarvetta koskea.
+class Player:
+    """Myöhemmissä tasoissa käytetty luokka, joka mahdollistaa sen, että tasoa ratkottaesta voi ohjata useampaa pelaajaa.
     """
-    def __init__(self, position_x, position_y):
-        self.position_x = position_x
-        self.position_y = position_y
-        self.is_open = False
-        self.group_index = 0
+    def __init__(self, level_util, position_x, position_y):
+        self.__level_util = level_util
+        self.__util = self.__level_util.util
+        self.__position_x = position_x
+        self.__position_y = position_y
+        self.__has_interacted = False
+        self.__draw_player = True
+
+    def move_left(self):
+        self.__util.add_to_event_list("move_player_left", self)
+
+    def move_right(self):
+        self.__util.add_to_event_list("move_player_right", self)
+
+    def move_up(self):
+        self.__util.add_to_event_list("move_player_up", self)
+
+    def move_down(self):
+        self.__util.add_to_event_list("move_player_down", self)
+
+    def interact(self):
+        self.__util.add_to_event_list("player_interact", self)
+
+    def get_position_x(self):
+        return self.__position_x
+
+    def get_position_y(self):
+        return self.__position_y
 
 class Door:
     """Luo oven jonka paikan pelaaja voi hakea.
@@ -204,196 +311,37 @@ class Util_Level_1:
         player_position_y = pelaajan paikka kartalla y suunnassa
         door = tason ovi ja sen paikka parametreina konstruktorille
     """
-    def __init__(self, player_x=1, player_y=1):
+    def __init__(self):
         self.util = Util()
-        self.player_position_x = player_x
-        self.player_position_y = player_y
-        self.door = Door_Util(30, 30)
+        self.player = Player(self, 1, 1)
+        self.players = [self.player]
+        self.door = Door(30, 30)
+        self.doors = [self.door]
         self.event_list = self.util.event_list
 
-    def move_player_left(self):
-        """Liikuttaa pelaajaa yhden ruudun vasemmalle.
-        """
-        self.player_position_x -= 1
-        self.util.draw_player(self.player_position_x, self.player_position_y)
+    def interact_condition(self, player):
+        return self.util.over_door(player)
 
-    def move_player_right(self):
-        """Liikuttaa pelaajaa yhden ruudun oikealle.
-        """
-        self.player_position_x += 1
-        self.util.draw_player(self.player_position_x, self.player_position_y)
-
-    def move_player_up(self):
-        """Liikuttaa pelaajaa yhden ruudun ylöspäin.
-        """
-        self.player_position_y -= 1
-        self.util.draw_player(self.player_position_x, self.player_position_y)
-
-    def move_player_down(self):
-        """Liikuttaa pelaajaa yhden ruudun alaspäin.
-        """
-        self.player_position_y += 1
-        self.util.draw_player(self.player_position_x, self.player_position_y)
-
-    def player_interact(self):
-        """Laittaa pelaajan avaamaan oven, jos se on sen päällä. Jos pelaaja onnistuu avaamaan oven, päivitetään ovi avonaiseksi.
-
-        Returns:
-            bool: Palauttaa onko pelaaja avannut oven onnistuneesti.
-        """
-        if self.player_position_x == self.door.position_x and self.player_position_y == self.door.position_y:
-            self.door.is_open = True
-            return True
-        return False
-
-    def draw_ui(self, amt):
-        """Piirtää tason tekstikäyttöliittymän peli-ikkunan yläosaan.
-
-        Args:
-            amt (int): Pelaajan lähettämien metodikutsujen määrä.
-        """
-        self.util.draw_text('Level_1', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt) + '/59', 16, 32)
-
-    def draw_map(self):
-        """Piirtää tason kartan
-        """
-        self.util.window.fill(self.util.background_color)
-        x = 0
-        y = 64
-        for tile in self.util.map_tiles:
-            self.util.window.blit(self.util.image_tiles[15], (x, y))
-            x += self.util.tile_pixel_size
-            if x >= self.util.width:
-                x = 0
-                y += self.util.tile_pixel_size
+    def interact_action(self, player):
+        self.util.open_door(player)
+    
+    def level_has_been_solved(self):
+        return self.player._Player__has_interacted
 
     def run(self, is_test=False):
-        """Ensimmäisen tason gameplay luuppi. 
-        Päivittää kaikki pelin tapahtumat ja käy läpi pelaajan lähettämät metodikutsut järjestyksessä, kunnes niitä ei enää ole.
-
-        Args:
-            is_test (bool, optional): Vaihdetaan arvoksi True jos halutaan pyörittää testitilassa. Defaults to False.
-        """
-        event_execution_amount = 0
-        self.util.load_tile_images()
-        self.clock = pygame.time.Clock()
-        time_since_last_event_list_execute = 0.0
-        run = True
-
-        while run:
-            if is_test and len(self.event_list) == 0:
-                pygame.quit()
-                return None
-
-            self.clock.tick(self.util.fps)
-            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-            if len(self.event_list) > 0 and time_since_last_event_list_execute > 40:
-                self.util.execute_next_method_in_event_list()
-                event_execution_amount += 1
-                time_since_last_event_list_execute = 0
-
-            self.draw_map()
-            self.util.draw_coords()
-            
-            if self.door.is_open:
-                self.util.draw_open_door(self.door.position_x, self.door.position_y)
-            else:
-                self.util.draw_closed_door(self.door.position_x, self.door.position_y)
-            
-            self.draw_ui(event_execution_amount)
-            
-            if(self.player_interact()):
-                self.util.draw_text_level_solved()
-            else:
-                self.util.draw_player(self.player_position_x, self.player_position_y)
-
-            pygame.display.update()
-
-        pygame.quit()
+        self.util.run(self, "Level_1", is_test, 40)
 
 class Level_1:
     """Pelaajalle avoinna oleva luokka jonka kautta kutsutaan tason ratkaisemiseen tarkoitettuja metodeja.
     """
     def __init__(self):
         self.__util_level_1 = Util_Level_1()
-
-    def move_player_left(self):
-        """Lisää alkuperäisen move_player_left metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
-        """
-        self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_left)
-
-    def move_player_right(self):
-        """Lisää alkuperäisen move_player_right metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
-        """
-        self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_right)
-
-    def move_player_up(self):
-        """Lisää alkuperäisen move_player_up metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
-        """
-        self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_up)
-
-    def move_player_down(self):
-        """Lisää alkuperäisen move_player_down metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
-        """
-        self.__util_level_1.util.add_to_event_list(self.__util_level_1.move_player_down)
-
-    def player_interact(self):
-        """Lisää alkuperäisen player_interact metodikutsun event_list metodikutsulistaan, josta se voidaan suorittaa myöhemmin kun peli käynnistetään.
-        """
-        self.__util_level_1.util.add_to_event_list(self.__util_level_1.player_interact)
+        self.player = self.__util_level_1.player
 
     def run(self):
         """Laittaa pelin pyörimään. Poistaa pelaajalta mahdollisuuden suorittaa peliluuppi testimoodissa.
         """
         self.__util_level_1.run()
-
-class Player:
-    """Myöhemmissä tasoissa käytetty luokka, joka mahdollistaa sen, että tasoa ratkottaesta voi ohjata useampaa pelaajaa.
-    """
-    def __init__(self, index, util):
-        self.__index = index
-        self.__util = util
-
-    def move_player_left(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_player_left, self.__index)
-
-    def move_player_right(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_player_right, self.__index)
-
-    def move_player_up(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_player_up, self.__index)
-
-    def move_player_down(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_player_down, self.__index)
-
-    def interact(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.player_interact, self.__index)
-
-class Player_Util:
-    """Myöhemmissä tasoissa käytetty luokka, joka mahdollistaa useamman pelaajan olemassaolon ja niiden piirtämisen.
-
-    Attributes:
-        position_x: pelaajan paikka kartalla x suunnassa.
-        position_y: pelaajan paikka kartalla y suunnassa.
-        has_interacted: pitää muistissa onko pelaaja mennyt oven läpi tai tehnyt jotain muuta.
-        draw_player: pitää muistissa sen, halutaanko pelaaja piirtää kartalle vai ei
-    """
-    def __init__(self, position_x, position_y):
-        self.position_x = position_x
-        self.position_y = position_y
-        self.has_interacted = False
-        self.draw_player = True
 
 class Util_Level_2:
     """Toisen tason työkalupakkiluokka.
@@ -405,166 +353,65 @@ class Util_Level_2:
     def __init__(self):
         self.util = Util()
 
-        self.p1 = Player_Util(1, 1)
-        self.p2 = Player_Util(3, 1)
-        self.p3 = Player_Util(5, 1)
-        self.p4 = Player_Util(7, 1)
-        self.p5 = Player_Util(9, 1)
-        self.p6 = Player_Util(11, 1)
-        self.p7 = Player_Util(13, 1)
-        self.p8 = Player_Util(15, 1)
-        self.p9 = Player_Util(17, 1)
-        self.p11 = Player_Util(21, 1)
-        self.p10 = Player_Util(19, 1)
-        self.p12 = Player_Util(23, 1)
-        self.p13 = Player_Util(25, 1)
-        self.p14 = Player_Util(27, 1)
-        self.p15 = Player_Util(29, 1)
-        self.p16 = Player_Util(31, 1)
+        self.p1 = Player(self, 1, 1)
+        self.p2 = Player(self, 3, 1)
+        self.p3 = Player(self, 5, 1)
+        self.p4 = Player(self, 7, 1)
+        self.p5 = Player(self, 9, 1)
+        self.p6 = Player(self, 11, 1)
+        self.p7 = Player(self, 13, 1)
+        self.p8 = Player(self, 15, 1)
+        self.p9 = Player(self, 17, 1)
+        self.p11 = Player(self, 21, 1)
+        self.p10 = Player(self, 19, 1)
+        self.p12 = Player(self, 23, 1)
+        self.p13 = Player(self, 25, 1)
+        self.p14 = Player(self, 27, 1)
+        self.p15 = Player(self, 29, 1)
+        self.p16 = Player(self, 31, 1)
         self.players = [self.p1, self.p2, self.p3, self.p4, self.p5, self.p6, self.p7, self.p8,
                self.p9, self.p10, self.p11, self.p12, self.p13, self.p14, self.p15, self.p16]
         
-        self.g1 = Door_Util(1, 30)
-        self.g2 = Door_Util(3, 30)
-        self.g3 = Door_Util(5, 30)
-        self.g4 = Door_Util(7, 30)
-        self.g5 = Door_Util(9, 30)
-        self.g6 = Door_Util(11, 30)
-        self.g7 = Door_Util(13, 30)
-        self.g8 = Door_Util(15, 30)
-        self.g9 = Door_Util(17, 30)
-        self.g10 = Door_Util(19, 30)
-        self.g11 = Door_Util(21, 30)
-        self.g12 = Door_Util(23, 30)
-        self.g13 = Door_Util(25, 30)
-        self.g14 = Door_Util(27, 30)
-        self.g15 = Door_Util(29, 30)
-        self.g16 = Door_Util(31, 30)
+        self.g1 = Door(1, 30)
+        self.g2 = Door(3, 30)
+        self.g3 = Door(5, 30)
+        self.g4 = Door(7, 30)
+        self.g5 = Door(9, 30)
+        self.g6 = Door(11, 30)
+        self.g7 = Door(13, 30)
+        self.g8 = Door(15, 30)
+        self.g9 = Door(17, 30)
+        self.g10 = Door(19, 30)
+        self.g11 = Door(21, 30)
+        self.g12 = Door(23, 30)
+        self.g13 = Door(25, 30)
+        self.g14 = Door(27, 30)
+        self.g15 = Door(29, 30)
+        self.g16 = Door(31, 30)
         self.doors = [self.g1, self.g2, self.g3, self.g4, self.g5, self.g6, self.g7, self.g8,
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
 
-    def draw_ui(self, amt):
-        self.util.draw_text('Level_2', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt) + '/480', 16, 32)
+    def interact_condition(self, player):
+        return self.util.over_door(player)
 
-    def draw_map(self):
-        self.util.window.fill(self.util.background_color)
-        x = 0
-        y = 64
-        for tile in self.util.map_tiles:
-            self.util.window.blit(self.util.image_tiles[15], (x, y))
-            x += self.util.tile_pixel_size
-            if x >= self.util.width:
-                x = 0
-                y += self.util.tile_pixel_size
-        for door in self.doors:
-            if door.is_open:
-                self.util.draw_open_door(door.position_x, door.position_y)
-            else:
-                self.util.draw_closed_door(door.position_x, door.position_y)
-
-    def move_player_up(self, i):
-        self.players[i].position_y -= 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
-
-    def move_player_down(self, i):
-        self.players[i].position_y += 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
-
-    def move_player_left(self, i):
-        self.players[i].position_x -= 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
-
-    def move_player_right(self, i):
-        self.players[i].position_x += 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
-
-    def player_interact(self, i):
-        if self.over_door(i):
-            self.open_door(i)
-            self.players[i].has_interacted = True
-            self.players[i].draw_player = False
-
-    def over_door(self, i):
-        for door in self.doors:
-            if (door.position_x == self.players[i].position_x) and (door.position_y == self.players[i].position_y):
-                return True
-        return False
-
-    def open_door(self, i):
-        for door in self.doors:
-            if (door.position_x == self.players[i].position_x) and (door.position_y == self.players[i].position_y):
-                door.is_open = True
+    def interact_action(self, player):
+        self.util.open_door(player)
 
     def level_has_been_solved(self):
         for player in self.players:
-            if player.has_interacted == False:
+            if player._Player__has_interacted == False:
                 return False
         return True
 
     def run(self, is_test=False):
-        event_execution_amount = 0
-        self.util.load_tile_images()
-        self.clock = pygame.time.Clock()
-        time_since_last_event_list_execute = 0.0
-
-        run = True
-        while run:
-            if is_test and len(self.util.event_list) == 0:
-                run = False
-                return None
-
-            self.clock.tick(self.util.fps)
-            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
-                self.util.execute_next_method_in_event_list()
-                event_execution_amount += 1
-                time_since_last_event_list_execute = 0
-
-            self.draw_map()
-            self.util.draw_coords()
-            self.draw_ui(event_execution_amount)
-            for player in self.players:
-                if player.draw_player:
-                    self.util.draw_player(player.position_x, player.position_y)
-            if self.level_has_been_solved():
-                self.util.draw_text_level_solved()
-            pygame.display.update()
-
-        pygame.quit()
+        self.util.run(self, "Level_2", is_test)
 
 class Level_2:
     """Toisen tason ratkomiseen tarkoitettu luokka.
     """
-    def __init__(self, players = []):
+    def __init__(self):
         self.__util_level_2 = Util_Level_2()
-        self.__p1 = Player(0, self.__util_level_2)
-        self.__p2 = Player(1, self.__util_level_2)
-        self.__p3 = Player(2, self.__util_level_2)
-        self.__p4 = Player(3, self.__util_level_2)
-        self.__p5 = Player(4, self.__util_level_2)
-        self.__p6 = Player(5, self.__util_level_2)
-        self.__p7 = Player(6, self.__util_level_2)
-        self.__p8 = Player(7, self.__util_level_2)
-        self.__p9 = Player(8, self.__util_level_2)
-        self.__p10 = Player(9, self.__util_level_2)
-        self.__p11 = Player(10, self.__util_level_2)
-        self.__p12 = Player(11, self.__util_level_2)
-        self.__p13 = Player(12, self.__util_level_2)
-        self.__p14 = Player(13, self.__util_level_2)
-        self.__p15 = Player(14, self.__util_level_2)
-        self.__p16 = Player(15, self.__util_level_2)
-        self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
-                self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
+        self.players = self.__util_level_2.players
 
     def run(self):
         self.__util_level_2.run()
@@ -573,165 +420,63 @@ class Util_Level_3:
     def __init__(self):
         self.util = Util()
         
-        self.p1 = Player_Util(1, 1)
-        self.p2 = Player_Util(3, 30)
-        self.p3 = Player_Util(5, 1)
-        self.p4 = Player_Util(7, 30)
-        self.p5 = Player_Util(9, 1)
-        self.p6 = Player_Util(11, 30)
-        self.p7 = Player_Util(13, 1)
-        self.p8 = Player_Util(15, 30)
-        self.p9 = Player_Util(17, 1)
-        self.p10 = Player_Util(19, 30)
-        self.p11 = Player_Util(21, 1)
-        self.p12 = Player_Util(23, 30)
-        self.p13 = Player_Util(25, 1)
-        self.p14 = Player_Util(27, 30)
-        self.p15 = Player_Util(29, 1)
-        self.p16 = Player_Util(31, 30)
+        self.p1 = Player(self, 1, 1)
+        self.p2 = Player(self, 3, 30)
+        self.p3 = Player(self, 5, 1)
+        self.p4 = Player(self, 7, 30)
+        self.p5 = Player(self, 9, 1)
+        self.p6 = Player(self, 11, 30)
+        self.p7 = Player(self, 13, 1)
+        self.p8 = Player(self, 15, 30)
+        self.p9 = Player(self, 17, 1)
+        self.p10 = Player(self, 19, 30)
+        self.p11 = Player(self, 21, 1)
+        self.p12 = Player(self, 23, 30)
+        self.p13 = Player(self, 25, 1)
+        self.p14 = Player(self, 27, 30)
+        self.p15 = Player(self, 29, 1)
+        self.p16 = Player(self, 31, 30)
         self.players = [self.p1, self.p2, self.p3, self.p4, self.p5, self.p6, self.p7, self.p8,
                self.p9, self.p10, self.p11, self.p12, self.p13, self.p14, self.p15, self.p16]
         
-        self.g1 = Door_Util(1, 30)
-        self.g2 = Door_Util(3, 1)
-        self.g3 = Door_Util(5, 30)
-        self.g4 = Door_Util(7, 1)
-        self.g5 = Door_Util(9, 30)
-        self.g6 = Door_Util(11, 1)
-        self.g7 = Door_Util(13, 30)
-        self.g8 = Door_Util(15, 1)
-        self.g9 = Door_Util(17, 30)
-        self.g10 = Door_Util(19, 1)
-        self.g11 = Door_Util(21, 30)
-        self.g12 = Door_Util(23, 1)
-        self.g13 = Door_Util(25, 30)
-        self.g14 = Door_Util(27, 1)
-        self.g15 = Door_Util(29, 30)
-        self.g16 = Door_Util(31, 1)
+        self.g1 = Door(1, 30)
+        self.g2 = Door(3, 1)
+        self.g3 = Door(5, 30)
+        self.g4 = Door(7, 1)
+        self.g5 = Door(9, 30)
+        self.g6 = Door(11, 1)
+        self.g7 = Door(13, 30)
+        self.g8 = Door(15, 1)
+        self.g9 = Door(17, 30)
+        self.g10 = Door(19, 1)
+        self.g11 = Door(21, 30)
+        self.g12 = Door(23, 1)
+        self.g13 = Door(25, 30)
+        self.g14 = Door(27, 1)
+        self.g15 = Door(29, 30)
+        self.g16 = Door(31, 1)
         self.doors = [self.g1, self.g2, self.g3, self.g4, self.g5, self.g6, self.g7, self.g8,
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
 
-    def draw_ui(self, amt):
-        self.util.draw_text('Level_3', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt) + '/480', 16, 32)
+    def interact_condition(self, player):
+        return self.util.over_door(player)
 
-    def draw_map(self):
-        self.util.window.fill(self.util.background_color)
-        x = 0
-        y = 64
-        for tile in self.util.map_tiles:
-            self.util.window.blit(self.util.image_tiles[15], (x, y))
-            x += self.util.tile_pixel_size
-            if x >= self.util.width:
-                x = 0
-                y += self.util.tile_pixel_size
-        for door in self.doors:
-            if door.is_open:
-                self.util.draw_open_door(door.position_x, door.position_y)
-            else:
-                self.util.draw_closed_door(door.position_x, door.position_y)
-
-    def move_player_up(self, i):
-        self.players[i].position_y -= 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
-
-    def move_player_down(self, i):
-        self.players[i].position_y += 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
-
-    def move_player_left(self, i):
-        self.players[i].position_x -= 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
-
-    def move_player_right(self, i):
-        self.players[i].position_x += 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[i].position_y)
-
-    def player_interact(self, i):
-        if self.over_door(i):
-            self.open_door(i)
-            self.players[i].has_interacted = True
-            self.players[i].draw_player = False
-
-    def over_door(self, i):
-        for door in self.doors:
-            if (door.position_x == self.players[i].position_x) and (door.position_y == self.players[i].position_y):
-                return True
-        return False
-    
-    def open_door(self, i):
-        for door in self.doors:
-            if (door.position_x == self.players[i].position_x) and (door.position_y == self.players[i].position_y):
-                door.is_open = True
+    def interact_action(self, player):
+        self.util.open_door(player)
 
     def level_has_been_solved(self):
         for player in self.players:
-            if player.has_interacted == False:
+            if player._Player__has_interacted == False:
                 return False
         return True
 
     def run(self, is_test=False):
-        event_execution_amount = 0
-        self.util.load_tile_images()
-        self.clock = pygame.time.Clock()
-        time_since_last_event_list_execute = 0.0
-
-        run = True
-        while run:
-            if is_test and len(self.util.event_list) == 0:
-                run = False
-                return None
-
-            self.clock.tick(self.util.fps)
-            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
-                self.util.execute_next_method_in_event_list()
-                event_execution_amount += 1
-                time_since_last_event_list_execute = 0
-
-            self.draw_map()
-            self.util.draw_coords()
-            self.draw_ui(event_execution_amount)
-            for player in self.players:
-                if player.draw_player:
-                    self.util.draw_player(player.position_x, player.position_y)
-            if self.level_has_been_solved():
-                self.util.draw_text_level_solved()
-            pygame.display.update()
-
-        pygame.quit()
+        self.util.run(self, "Level_3", is_test)
 
 class Level_3:
-    def __init__(self, players = []):
+    def __init__(self):
         self.__util_level_3 = Util_Level_3()
-
-        self.__p1 = Player(0, self.__util_level_3)
-        self.__p2 = Player(1, self.__util_level_3)
-        self.__p3 = Player(2, self.__util_level_3)
-        self.__p4 = Player(3, self.__util_level_3)
-        self.__p5 = Player(4, self.__util_level_3)
-        self.__p6 = Player(5, self.__util_level_3)
-        self.__p7 = Player(6, self.__util_level_3)
-        self.__p8 = Player(7, self.__util_level_3)
-        self.__p9 = Player(8, self.__util_level_3)
-        self.__p10 = Player(9, self.__util_level_3)
-        self.__p11 = Player(10, self.__util_level_3)
-        self.__p12 = Player(11, self.__util_level_3)
-        self.__p13 = Player(12, self.__util_level_3)
-        self.__p14 = Player(13, self.__util_level_3)
-        self.__p15 = Player(14, self.__util_level_3)
-        self.__p16 = Player(15, self.__util_level_3)
-        self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
-                self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
+        self.players = self.__util_level_3.players
 
     def run(self):
         self.__util_level_3.run()
@@ -740,180 +485,50 @@ class Util_Level_4:
     def __init__(self):
         self.util = Util()
 
-        self.p1 = Player_Util(1, 1)
-        self.p2 = Player_Util(3, 1)
-        self.p3 = Player_Util(5, 1)
-        self.p4 = Player_Util(7, 1)
-        self.p5 = Player_Util(9, 1)
-        self.p6 = Player_Util(11, 1)
-        self.p7 = Player_Util(13, 1)
-        self.p8 = Player_Util(15, 1)
-        self.p9 = Player_Util(17, 1)
-        self.p11 = Player_Util(21, 1)
-        self.p10 = Player_Util(19, 1)
-        self.p12 = Player_Util(23, 1)
-        self.p13 = Player_Util(25, 1)
-        self.p14 = Player_Util(27, 1)
-        self.p15 = Player_Util(29, 1)
-        self.p16 = Player_Util(31, 1)
+        self.p1 = Player(self, 1, 1)
+        self.p2 = Player(self, 3, 1)
+        self.p3 = Player(self, 5, 1)
+        self.p4 = Player(self, 7, 1)
+        self.p5 = Player(self, 9, 1)
+        self.p6 = Player(self, 11, 1)
+        self.p7 = Player(self, 13, 1)
+        self.p8 = Player(self, 15, 1)
+        self.p9 = Player(self, 17, 1)
+        self.p11 = Player(self, 21, 1)
+        self.p10 = Player(self, 19, 1)
+        self.p12 = Player(self, 23, 1)
+        self.p13 = Player(self, 25, 1)
+        self.p14 = Player(self, 27, 1)
+        self.p15 = Player(self, 29, 1)
+        self.p16 = Player(self, 31, 1)
         self.players = [self.p1, self.p2, self.p3, self.p4, self.p5, self.p6, self.p7, self.p8,
                self.p9, self.p10, self.p11, self.p12, self.p13, self.p14, self.p15, self.p16]
         
-        self.door = Door_Util(15, 15)
+        self.door = Door(15, 15)
+        self.doors = [self.door]
 
-    def draw_ui(self, amt):
-        self.util.draw_text('Level_4', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt) + '/368', 16, 32)
+    def interact_condition(self, player):
+        return self.util.over_door(player)
 
-    def draw_map(self):
-        self.util.window.fill(self.util.background_color)
-        x = 0
-        y = 64
-        for tile in self.util.map_tiles:
-            self.util.window.blit(self.util.image_tiles[15], (x, y))
-            x += self.util.tile_pixel_size
-            if x >= self.util.width:
-                x = 0
-                y += self.util.tile_pixel_size
-            if self.door.is_open:
-                self.util.draw_open_door(self.door.position_x, self.door.position_y)
-            else:
-                self.util.draw_closed_door(self.door.position_x, self.door.position_y)
-
-    def move_player_up(self, i):
-        self.players[i].position_y -= 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
-
-    def move_player_down(self, i):
-        self.players[i].position_y += 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
-
-    def move_player_left(self, i):
-        self.players[i].position_x -= 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
-
-    def move_player_right(self, i):
-        self.players[i].position_x += 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
-
-    def player_interact(self, i):
-        if self.over_goal(i):
-            self.door.is_open = True
-            self.players[i].has_interacted = True
-            self.players[i].draw_player = False
-
-    def over_goal(self, i):
-        if (self.door.position_x == self.players[i].position_x) and (self.door.position_y == self.players[i].position_y):
-            return True
-        return False
+    def interact_action(self, player):
+        self.util.open_door(player)
 
     def level_has_been_solved(self):
         for player in self.players:
-            if player.has_interacted == False:
+            if player._Player__has_interacted == False:
                 return False
         return True
 
     def run(self, is_test=False):
-        event_execution_amount = 0
-        self.util.load_tile_images()
-        self.clock = pygame.time.Clock()
-        time_since_last_event_list_execute = 0.0
-
-        run = True
-        while run:
-            if is_test and len(self.util.event_list) == 0:
-                run = False
-                return None
-
-            self.clock.tick(self.util.fps)
-            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
-                self.util.execute_next_method_in_event_list()
-                event_execution_amount += 1
-                time_since_last_event_list_execute = 0
-
-            self.draw_map()
-            self.util.draw_coords()
-            self.draw_ui(event_execution_amount)
-            for player in self.players:
-                if player.draw_player:
-                    self.util.draw_player(player.position_x, player.position_y)
-            if self.level_has_been_solved():
-                self.util.draw_text_level_solved()
-            pygame.display.update()
-
-        pygame.quit()
+        self.util.run(self, "Level_4", is_test)
 
 class Level_4:
     def __init__(self, players = []):
         self.__util_level_4 = Util_Level_4()
-
-        self.__p1 = Player(0, self.__util_level_4)
-        self.__p2 = Player(1, self.__util_level_4)
-        self.__p3 = Player(2, self.__util_level_4)
-        self.__p4 = Player(3, self.__util_level_4)
-        self.__p5 = Player(4, self.__util_level_4)
-        self.__p6 = Player(5, self.__util_level_4)
-        self.__p7 = Player(6, self.__util_level_4)
-        self.__p8 = Player(7, self.__util_level_4)
-        self.__p9 = Player(8, self.__util_level_4)
-        self.__p10 = Player(9, self.__util_level_4)
-        self.__p11 = Player(10, self.__util_level_4)
-        self.__p12 = Player(11, self.__util_level_4)
-        self.__p13 = Player(12, self.__util_level_4)
-        self.__p14 = Player(13, self.__util_level_4)
-        self.__p15 = Player(14, self.__util_level_4)
-        self.__p16 = Player(15, self.__util_level_4)
-        self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
-                self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
+        self.players = self.__util_level_4.players
 
     def run(self):
         self.__util_level_4.run()
-
-class Player_2:
-    def __init__(self, index, util, group_index, position_x, position_y):
-        self.__index = index
-        self.__util = util
-        self.__group_index = group_index
-        self.__draw_player = True
-        self.__has_interacted = False
-        self.__position_x = position_x
-        self.__position_y = position_y
-
-    def move_left(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_player_left, self.__index)
-
-    def move_right(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_player_right, self.__index)
-
-    def move_up(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_player_up, self.__index)
-
-    def move_down(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_player_down, self.__index)
-
-    def interact(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.player_interact, self.__index)
-
-    def get_position_x(self):
-        return self.__position_x
-
-    def get_position_y(self):
-        return self.__position_y
 
 class Util_Level_5:
     def __init__(self):
@@ -925,118 +540,42 @@ class Util_Level_5:
             y = random.choice([i for i in range(1,30) if i not in [15]])
             self.random_positions.append((x, y))
 
-        self.__p1 = Player_2(0, self, 1, self.random_positions[0][0], self.random_positions[0][1])
-        self.__p2 = Player_2(1, self, 1, self.random_positions[1][0], self.random_positions[1][1])
-        self.__p3 = Player_2(2, self, 1, self.random_positions[2][0], self.random_positions[2][1])
-        self.__p4 = Player_2(3, self, 1, self.random_positions[3][0], self.random_positions[3][1])
-        self.__p5 = Player_2(4, self, 1, self.random_positions[4][0], self.random_positions[4][1])
-        self.__p6 = Player_2(5, self, 1, self.random_positions[5][0], self.random_positions[5][1])
-        self.__p7 = Player_2(6, self, 1, self.random_positions[6][0], self.random_positions[6][1])
-        self.__p8 = Player_2(7, self, 1, self.random_positions[7][0], self.random_positions[7][1])
-        self.__p9 = Player_2(8, self, 1, self.random_positions[8][0], self.random_positions[8][1])
-        self.__p10 = Player_2(9, self, 1, self.random_positions[9][0], self.random_positions[9][1])
-        self.__p11 = Player_2(10, self, 1, self.random_positions[10][0], self.random_positions[10][1])
-        self.__p12 = Player_2(11, self, 1, self.random_positions[11][0], self.random_positions[11][1])
-        self.__p13 = Player_2(12, self, 1, self.random_positions[12][0], self.random_positions[11][1])
-        self.__p14 = Player_2(13, self, 1, self.random_positions[13][0], self.random_positions[12][1])
-        self.__p15 = Player_2(14, self, 1, self.random_positions[14][0], self.random_positions[13][1])
-        self.__p16 = Player_2(15, self, 1, self.random_positions[15][0], self.random_positions[14][1])
+        self.__p1 = Player(self, self.random_positions[0][0], self.random_positions[0][1])
+        self.__p2 = Player(self, self.random_positions[1][0], self.random_positions[1][1])
+        self.__p3 = Player(self, self.random_positions[2][0], self.random_positions[2][1])
+        self.__p4 = Player(self, self.random_positions[3][0], self.random_positions[3][1])
+        self.__p5 = Player(self, self.random_positions[4][0], self.random_positions[4][1])
+        self.__p6 = Player(self, self.random_positions[5][0], self.random_positions[5][1])
+        self.__p7 = Player(self, self.random_positions[6][0], self.random_positions[6][1])
+        self.__p8 = Player(self, self.random_positions[7][0], self.random_positions[7][1])
+        self.__p9 = Player(self, self.random_positions[8][0], self.random_positions[8][1])
+        self.__p10 = Player(self, self.random_positions[9][0], self.random_positions[9][1])
+        self.__p11 = Player(self, self.random_positions[10][0], self.random_positions[10][1])
+        self.__p12 = Player(self, self.random_positions[11][0], self.random_positions[11][1])
+        self.__p13 = Player(self, self.random_positions[12][0], self.random_positions[11][1])
+        self.__p14 = Player(self, self.random_positions[13][0], self.random_positions[12][1])
+        self.__p15 = Player(self, self.random_positions[14][0], self.random_positions[13][1])
+        self.__p16 = Player(self, self.random_positions[15][0], self.random_positions[14][1])
         self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
                self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
 
-        self.door = Door_Util(15, 15)
+        self.door = Door(15, 15)
+        self.doors = [self.door]
 
-    def draw_ui(self, amt):
-        self.util.draw_text('Level_5', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt), 16, 32)
+    def interact_condition(self, player):
+        return self.util.over_door(player)
 
-    def draw_map(self):
-        self.util.window.fill(self.util.background_color)
-        x = 0
-        y = 64
-        for tile in self.util.map_tiles:
-            self.util.window.blit(self.util.image_tiles[15], (x, y))
-            x += self.util.tile_pixel_size
-            if x >= self.util.width:
-                x = 0
-                y += self.util.tile_pixel_size
-            if self.door.is_open:
-                self.util.draw_open_door(self.door.position_x, self.door.position_y)
-            else:
-                self.util.draw_closed_door(self.door.position_x, self.door.position_y)
-
-    def move_player_up(self, i):
-        self.players[i]._Player_2__position_y -= 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_down(self, i):
-        self.players[i]._Player_2__position_y += 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_left(self, i):
-        self.players[i]._Player_2__position_x -= 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_right(self, i):
-        self.players[i]._Player_2__position_x += 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def player_interact(self, i):
-        if self.over_goal(i):
-            self.door.is_open = True
-            self.players[i]._Player_2__has_interacted = True
-            self.players[i]._Player_2__draw_player = False
-
-    def over_goal(self, i):
-        if (self.door.position_x == self.players[i]._Player_2__position_x) and (self.door.position_y == self.players[i]._Player_2__position_y):
-            return True
-        return False
+    def interact_action(self, player):
+        self.util.open_door(player)
 
     def level_has_been_solved(self):
         for player in self.players:
-            if player._Player_2__has_interacted == False:
+            if player._Player__has_interacted == False:
                 return False
         return True
 
     def run(self, is_test=False):
-        event_execution_amount = 0
-        self.util.load_tile_images()
-        self.clock = pygame.time.Clock()
-        time_since_last_event_list_execute = 0.0
-
-        run = True
-        while run:
-            if is_test and len(self.util.event_list) == 0:
-                run = False
-                return None
-
-            self.clock.tick(self.util.fps)
-            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
-                self.util.execute_next_method_in_event_list()
-                event_execution_amount += 1
-                time_since_last_event_list_execute = 0
-
-            self.draw_map()
-            self.util.draw_coords()
-            self.draw_ui(event_execution_amount)
-            for player in self.players:
-                if player._Player_2__draw_player:
-                    self.util.draw_player(player._Player_2__position_x, player._Player_2__position_y)
-            if self.level_has_been_solved():
-                self.util.draw_text_level_solved()
-            pygame.display.update()
-
-        pygame.quit()
+        self.util.run(self, "Level_5", is_test)
 
 class Level_5:
     def __init__(self, players = []):
@@ -1052,6 +591,7 @@ class Util_Level_6:
         door_x = random.randint(1, 30)
         door_y = random.randint(1, 30)
         self.door = Door(door_x, door_y)
+        self.doors = [self.door]
         
         self.random_positions = []
         for i in range(16):
@@ -1059,116 +599,33 @@ class Util_Level_6:
             y = random.choice([i for i in range(1,30) if i not in [door_y]])
             self.random_positions.append((x, y))
 
-        self.__p1 = Player_2(0, self, 1, self.random_positions[0][0], self.random_positions[0][1])
-        self.__p2 = Player_2(1, self, 1, self.random_positions[1][0], self.random_positions[1][1])
-        self.__p3 = Player_2(2, self, 1, self.random_positions[2][0], self.random_positions[2][1])
-        self.__p4 = Player_2(3, self, 1, self.random_positions[3][0], self.random_positions[3][1])
-        self.__p5 = Player_2(4, self, 1, self.random_positions[4][0], self.random_positions[4][1])
-        self.__p6 = Player_2(5, self, 1, self.random_positions[5][0], self.random_positions[5][1])
-        self.__p7 = Player_2(6, self, 1, self.random_positions[6][0], self.random_positions[6][1])
-        self.__p8 = Player_2(7, self, 1, self.random_positions[7][0], self.random_positions[7][1])
-        self.__p9 = Player_2(8, self, 1, self.random_positions[8][0], self.random_positions[8][1])
-        self.__p10 = Player_2(9, self, 1, self.random_positions[9][0], self.random_positions[9][1])
-        self.__p11 = Player_2(10, self, 1, self.random_positions[10][0], self.random_positions[10][1])
-        self.__p12 = Player_2(11, self, 1, self.random_positions[11][0], self.random_positions[11][1])
-        self.__p13 = Player_2(12, self, 1, self.random_positions[12][0], self.random_positions[11][1])
-        self.__p14 = Player_2(13, self, 1, self.random_positions[13][0], self.random_positions[12][1])
-        self.__p15 = Player_2(14, self, 1, self.random_positions[14][0], self.random_positions[13][1])
-        self.__p16 = Player_2(15, self, 1, self.random_positions[15][0], self.random_positions[14][1])
+        self.__p1 = Player(self, self.random_positions[0][0], self.random_positions[0][1])
+        self.__p2 = Player(self, self.random_positions[1][0], self.random_positions[1][1])
+        self.__p3 = Player(self, self.random_positions[2][0], self.random_positions[2][1])
+        self.__p4 = Player(self, self.random_positions[3][0], self.random_positions[3][1])
+        self.__p5 = Player(self, self.random_positions[4][0], self.random_positions[4][1])
+        self.__p6 = Player(self, self.random_positions[5][0], self.random_positions[5][1])
+        self.__p7 = Player(self, self.random_positions[6][0], self.random_positions[6][1])
+        self.__p8 = Player(self, self.random_positions[7][0], self.random_positions[7][1])
+        self.__p9 = Player(self, self.random_positions[8][0], self.random_positions[8][1])
+        self.__p10 = Player(self, self.random_positions[9][0], self.random_positions[9][1])
+        self.__p11 = Player(self, self.random_positions[10][0], self.random_positions[10][1])
+        self.__p12 = Player(self, self.random_positions[11][0], self.random_positions[11][1])
+        self.__p13 = Player(self, self.random_positions[12][0], self.random_positions[11][1])
+        self.__p14 = Player(self, self.random_positions[13][0], self.random_positions[12][1])
+        self.__p15 = Player(self, self.random_positions[14][0], self.random_positions[13][1])
+        self.__p16 = Player(self, self.random_positions[15][0], self.random_positions[14][1])
         self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
                self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
 
-    def draw_ui(self, amt):
-        self.util.draw_text('Level_6', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt), 16, 32)
+    def interact_condition(self, player):
+        return self.util.over_door(player)
 
-    def draw_map(self):
-        self.util.window.fill(self.util.background_color)
-        x = 0
-        y = 64
-        for tile in self.util.map_tiles:
-            self.util.window.blit(self.util.image_tiles[15], (x, y))
-            x += self.util.tile_pixel_size
-            if x >= self.util.width:
-                x = 0
-                y += self.util.tile_pixel_size
-            if self.door._Door__is_open:
-                self.util.draw_open_door(self.door._Door__position_x, self.door._Door__position_y)
-            else:
-                self.util.draw_closed_door(self.door._Door__position_x, self.door._Door__position_y)
-
-    def move_player_up(self, i):
-        self.players[i]._Player_2__position_y -= 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_down(self, i):
-        self.players[i]._Player_2__position_y += 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_left(self, i):
-        self.players[i]._Player_2__position_x -= 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_right(self, i):
-        self.players[i]._Player_2__position_x += 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def player_interact(self, i):
-        if self.over_goal(i):
-            self.door._Door__is_open = True
-            self.players[i]._Player_2__has_interacted = True
-            self.players[i]._Player_2__draw_player = False
-
-    def over_goal(self, i):
-        if (self.door._Door__position_x == self.players[i]._Player_2__position_x) and (self.door._Door__position_y == self.players[i]._Player_2__position_y):
-            return True
-        return False
-
-    def level_has_been_solved(self):
-        for player in self.players:
-            if player._Player_2__has_interacted == False:
-                return False
-        return True
+    def interact_action(self, player):
+        self.util.open_door(player)
 
     def run(self, is_test=False):
-        event_execution_amount = 0
-        self.util.load_tile_images()
-        self.clock = pygame.time.Clock()
-        time_since_last_event_list_execute = 0.0
-
-        run = True
-        while run:
-            if is_test and len(self.util.event_list) == 0:
-                run = False
-                return None
-
-            self.clock.tick(self.util.fps)
-            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
-                self.util.execute_next_method_in_event_list()
-                event_execution_amount += 1
-                time_since_last_event_list_execute = 0
-
-            self.draw_map()
-            self.util.draw_coords()
-            self.draw_ui(event_execution_amount)
-            for player in self.players:
-                if player._Player_2__draw_player:
-                    self.util.draw_player(player._Player_2__position_x, player._Player_2__position_y)
-            if self.level_has_been_solved():
-                self.util.draw_text_level_solved()
-            pygame.display.update()
-
-        pygame.quit()
+        self.util.run(self, "Level_6", is_test)
 
 class Level_6:
     def __init__(self, players = []):
@@ -1178,365 +635,3 @@ class Level_6:
 
     def run(self):
         self.__util_level_6.run()
-
-class Util_Level_7:
-    def __init__(self):
-        self.util = Util()
-        
-        self.random_positions = []
-        for i in range(16):
-            # create a spawner that can not spawn players on top of each other
-            x = random.choice([i for i in range(1,31) if i not in [10, 20]])
-            y = random.choice([i for i in range(1,31) if i not in [15]])
-            self.random_positions.append((x, y))
-
-        self.__p1 = Player_2(0, self, 1, self.random_positions[0][0], self.random_positions[0][1])
-        self.__p2 = Player_2(1, self, 1, self.random_positions[1][0], self.random_positions[1][1])
-        self.__p3 = Player_2(2, self, 1, self.random_positions[2][0], self.random_positions[2][1])
-        self.__p4 = Player_2(3, self, 1, self.random_positions[3][0], self.random_positions[3][1])
-        self.__p5 = Player_2(4, self, 1, self.random_positions[4][0], self.random_positions[4][1])
-        self.__p6 = Player_2(5, self, 1, self.random_positions[5][0], self.random_positions[5][1])
-        self.__p7 = Player_2(6, self, 1, self.random_positions[6][0], self.random_positions[6][1])
-        self.__p8 = Player_2(7, self, 1, self.random_positions[7][0], self.random_positions[7][1])
-        self.__p9 = Player_2(8, self, 1, self.random_positions[8][0], self.random_positions[8][1])
-        self.__p10 = Player_2(9, self, 1, self.random_positions[9][0], self.random_positions[9][1])
-        self.__p11 = Player_2(10, self, 1, self.random_positions[10][0], self.random_positions[10][1])
-        self.__p12 = Player_2(11, self, 1, self.random_positions[11][0], self.random_positions[11][1])
-        self.__p13 = Player_2(12, self, 1, self.random_positions[12][0], self.random_positions[11][1])
-        self.__p14 = Player_2(13, self, 1, self.random_positions[13][0], self.random_positions[12][1])
-        self.__p15 = Player_2(14, self, 1, self.random_positions[14][0], self.random_positions[13][1])
-        self.__p16 = Player_2(15, self, 1, self.random_positions[15][0], self.random_positions[14][1])
-        self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
-               self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
-
-        group1 = self.create_player_group(self.players)
-        
-        for player in self.players:
-            if player in group1:
-                player._Player_2__group_index = 2
-
-        self.door_1 = Door_Util(10, 15)
-        self.door_2 = Door_Util(20, 15)
-
-        self.doors = [self.door_1, self.door_2]
-
-        self.level_failed = False
-
-    def create_player_group(self, players):
-        biggest_dist = 0
-        leader1 = players[0]
-        leader2 = players[0]
-        for player1 in players:
-            player1_xy = [player1.get_position_x(), player1.get_position_y()]
-            for player2 in players:
-                if player1 == player2:
-                    continue
-                player2_xy = [player2.get_position_x(), player2.get_position_y()]
-                dist = self.dist(player1_xy, player2_xy)
-                if(dist > biggest_dist):
-                    biggest_dist = dist
-                    leader1 = player1
-                    leader2 = player2
-
-        leader1_xy = [leader1.get_position_x(), leader1.get_position_y()]
-        distances = []
-        players_grp1 = []
-        for player in players:
-            if player == leader1:
-                continue
-            player_xy = [player.get_position_x(), player.get_position_y()]
-            dist = self.dist(leader1_xy, player_xy)
-            distances.append(dist)
-            players_grp1.append(player)
-
-        zipped_pairs = zip(distances, players_grp1)
-        sorted_players = sorted(zipped_pairs, key = lambda x: x[0])
-
-        group = [leader1]
-        for i in range(7):
-            group.append(sorted_players[i][1])
-        
-        return group     
-
-    def dist(self, xy1, xy2):
-        return math.sqrt((xy2[0] - xy1[0])**2 + (xy2[1] - xy1[1])**2)
-
-    def draw_ui(self, amt):
-        self.util.draw_text('Level_7', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt), 16, 32)
-
-    def draw_map(self):
-        self.util.window.fill(self.util.background_color)
-        x = 0
-        y = 64
-        for tile in self.util.map_tiles:
-            self.util.window.blit(self.util.image_tiles[15], (x, y))
-            x += self.util.tile_pixel_size
-            if x >= self.util.width:
-                x = 0
-                y += self.util.tile_pixel_size
-            for door in self.doors:
-                if door.is_open:
-                    self.util.draw_open_door(door.position_x, door.position_y)
-                else:
-                    self.util.draw_closed_door(door.position_x, door.position_y)
-
-    def move_player_up(self, i):
-        self.players[i]._Player_2__position_y -= 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_down(self, i):
-        self.players[i]._Player_2__position_y += 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_left(self, i):
-        self.players[i]._Player_2__position_x -= 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def move_player_right(self, i):
-        self.players[i]._Player_2__position_x += 1
-        self.util.draw_player(
-            self.players[i]._Player_2__position_x, self.players[i]._Player_2__position_y)
-
-    def player_interact(self, i):
-        current_door = self.over_goal(i)
-        if current_door != None:
-            if self.correct_goal(i, current_door):
-                current_door.is_open = True
-                self.players[i]._Player_2__has_interacted = True
-                self.players[i]._Player_2__draw_player = False
-            else:
-                self.level_failed = True
-
-    def correct_goal(self, i, door):
-        if door.group_index == 0:
-            door.group_index = self.players[i]._Player_2__group_index
-            return True
-        elif door.group_index == 1 and self.players[i]._Player_2__group_index == 1:
-            return True
-        elif door.group_index == 2 and self.players[i]._Player_2__group_index == 2:
-            return True
-        else:
-            return False
-
-    def over_goal(self, i):
-        if (self.doors[0].position_x == self.players[i]._Player_2__position_x) and (self.doors[0].position_y == self.players[i]._Player_2__position_y):
-            return self.doors[0]
-        elif (self.doors[1].position_x == self.players[i]._Player_2__position_x) and (self.doors[1].position_y == self.players[i]._Player_2__position_y):
-            return self.doors[1]
-        else: 
-            return None
-
-    def level_has_been_solved(self):
-        for player in self.players:
-            if player._Player_2__has_interacted == False:
-                return False
-        return True
-
-    def run(self, is_test=False):
-        event_execution_amount = 0
-        self.util.load_tile_images()
-        self.clock = pygame.time.Clock()
-        time_since_last_event_list_execute = 0.0
-
-        run = True
-        while run:
-            if is_test and len(self.util.event_list) == 0:
-                run = False
-                return None
-
-            self.clock.tick(self.util.fps)
-            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-            if len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2 and self.level_failed == False:
-                self.util.execute_next_method_in_event_list()
-                event_execution_amount += 1
-                time_since_last_event_list_execute = 0
-
-            self.draw_map()
-            self.util.draw_coords()
-            self.draw_ui(event_execution_amount)
-            for player in self.players:
-                if player._Player_2__draw_player:
-                    self.util.draw_player(player._Player_2__position_x, player._Player_2__position_y)
-            if self.level_has_been_solved():
-                self.util.draw_text_level_solved()
-            if self.level_failed:
-                self.util.draw_text_level_failed()
-            pygame.display.update()
-
-        pygame.quit()
-
-class Level_7:
-    def __init__(self, players = []):
-        self.__util_level_7 = Util_Level_7()
-        self.players = self.__util_level_7.players
-
-    def run(self):
-        self.__util_level_7.run()
-
-class Letter:
-    def __init__(self, util, index):
-        self.__util = util
-        self.__index = index
-
-    def move_letter_left(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_letter_left, self.__index)
-
-    def move_letter_right(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_letter_right, self.__index)
-
-    def move_letter_up(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_letter_up, self.__index)
-
-    def move_letter_down(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.move_letter_down, self.__index)
-
-    def interact(self):
-        self.__util.util.add_to_event_list_with_parameter(
-            self.__util.letter_interact, self.__index)
-
-class Letter_Util:
-    def __init__(self, letter, position_x, position_y, util, index):
-        self.letter = letter
-        self.position_x = position_x
-        self.position_y = position_y
-        self.__util = util
-        self.__index = index
-
-class Util_Level_8:
-    def __init__(self):
-        self.util = Util()
-
-        self.__l1 = Letter_Util("A", 1, 1, self, 1)
-        self.letters = [self.__l1, self.__l2, self.__l3, self.__l4, self.__l5]
-        
-        self.door = Door_Util(15, 15)
-
-    def draw_ui(self, amt):
-        self.util.draw_text('Level_4', 16, 16)
-        self.util.draw_text('call_amount=' + str(amt) + '/368', 16, 32)
-
-    def draw_map(self):
-        self.util.window.fill(self.util.background_color)
-        x = 0
-        y = 64
-        for tile in self.util.map_tiles:
-            self.util.window.blit(self.util.image_tiles[15], (x, y))
-            x += self.util.tile_pixel_size
-            if x >= self.util.width:
-                x = 0
-                y += self.util.tile_pixel_size
-            if self.door.is_open:
-                self.util.draw_open_door(self.door.position_x, self.door.position_y)
-            else:
-                self.util.draw_closed_door(self.door.position_x, self.door.position_y)
-
-    def move_player_up(self, i):
-        self.players[i].position_y -= 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
-
-    def move_player_down(self, i):
-        self.players[i].position_y += 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
-
-    def move_player_left(self, i):
-        self.players[i].position_x -= 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
-
-    def move_player_right(self, i):
-        self.players[i].position_x += 1
-        self.util.draw_player(
-            self.players[i].position_x, self.players[0].position_x)
-
-    def player_interact(self, i):
-        if self.over_goal(i):
-            self.door.is_open = True
-            self.players[i].has_interacted = True
-            self.players[i].draw_player = False
-
-    def over_goal(self, i):
-        if (self.door.position_x == self.players[i].position_x) and (self.door.position_y == self.players[i].position_y):
-            return True
-        return False
-
-    def level_has_been_solved(self):
-        for player in self.players:
-            if player.has_interacted == False:
-                return False
-        return True
-
-    def run(self, is_test=False):
-        event_execution_amount = 0
-        self.util.load_tile_images()
-        self.clock = pygame.time.Clock()
-        time_since_last_event_list_execute = 0.0
-
-        run = True
-        while run:
-            if is_test and len(self.util.event_list) == 0:
-                run = False
-                return None
-
-            self.clock.tick(self.util.fps)
-            time_since_last_event_list_execute += self.clock.tick(self.util.fps)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-            if(len(self.util.event_list) > 0 and time_since_last_event_list_execute > 2):
-                self.util.execute_next_method_in_event_list()
-                event_execution_amount += 1
-                time_since_last_event_list_execute = 0
-
-            self.draw_map()
-            self.util.draw_coords()
-            self.draw_ui(event_execution_amount)
-            for letter in self.letters:
-                self.util.draw_text_playable(letter.letter, letter.position_x, letter.position_y)
-            if self.level_has_been_solved():
-                self.util.draw_text_level_solved()
-            pygame.display.update()
-
-        pygame.quit()
-
-class Level_8:
-    def __init__(self, players = []):
-        self.__util_level_5 = Util_Level_5()
-
-        self.__p1 = Player_2(0, self.__util_level_4)
-        self.__p2 = Player(1, self.__util_level_4)
-        self.__p3 = Player(2, self.__util_level_4)
-        self.__p4 = Player(3, self.__util_level_4)
-        self.__p5 = Player(4, self.__util_level_4)
-        self.__p6 = Player(5, self.__util_level_4)
-        self.__p7 = Player(6, self.__util_level_4)
-        self.__p8 = Player(7, self.__util_level_4)
-        self.__p9 = Player(8, self.__util_level_4)
-        self.__p10 = Player(9, self.__util_level_4)
-        self.__p11 = Player(10, self.__util_level_4)
-        self.__p12 = Player(11, self.__util_level_4)
-        self.__p13 = Player(12, self.__util_level_4)
-        self.__p14 = Player(13, self.__util_level_4)
-        self.__p15 = Player(14, self.__util_level_4)
-        self.__p16 = Player(15, self.__util_level_4)
-        self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
-                self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
-
-    def run(self):
-        self.__util_level_5.run()

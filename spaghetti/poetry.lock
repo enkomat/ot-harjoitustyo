@@ -201,6 +201,14 @@ toml = ">=0.7.1"
 docs = ["sphinx (==3.5.1)", "python-docs-theme (==2020.12)"]
 
 [[package]]
+name = "pymitter"
+version = "0.3.0"
+description = "Python port of the extended Node.js EventEmitter 2 approach providing namespaces, wildcards and TTL."
+category = "main"
+optional = false
+python-versions = ">=2.7"
+
+[[package]]
 name = "pyparsing"
 version = "2.4.7"
 description = "Python parsing module"
@@ -277,7 +285,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.9"
-content-hash = "e131cebd0d0a79452fe3842168f82dbdc8b6a700eba1eba47de26ad4a1607fb2"
+content-hash = "298ee02ed2b553532dd3f3812de83fc1415c90013958ed1de6954d4f53b64100"
 
 [metadata.files]
 astroid = [
@@ -467,6 +475,9 @@ pygame = [
 pylint = [
     {file = "pylint-2.7.4-py3-none-any.whl", hash = "sha256:209d712ec870a0182df034ae19f347e725c1e615b2269519ab58a35b3fcbbe7a"},
     {file = "pylint-2.7.4.tar.gz", hash = "sha256:bd38914c7731cdc518634a8d3c5585951302b6e2b6de60fbb3f7a0220e21eeee"},
+]
+pymitter = [
+    {file = "pymitter-0.3.0.tar.gz", hash = "sha256:edea199cb371ff4bbdd93bd8a167f1752ac3a23a7a55fd51e84bfacf575f2181"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
