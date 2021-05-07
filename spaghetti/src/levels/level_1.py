@@ -11,14 +11,12 @@ class Util_Level_1:
     """
     def __init__(self):
         self.util = Util(self, "Level_1", 40)
+        
         self.player = Player(self, 1, 1)
         self.players = [self.player]
+        
         self.door = Door(30, 30)
         self.doors = [self.door]
-        self.event_list = self.util.event_list
-    
-    def level_has_been_solved(self):
-        return self.player._Player__has_interacted
 
     def run(self, is_test=False):
         self.util.run(is_test)

@@ -2,7 +2,6 @@ import pygame
 import os
 import random
 import math
-from levels import *
 from enum import Enum
 
 class Image_Tile:
@@ -83,7 +82,7 @@ class Util:
                 new_bmp.convert()
                 self.image_tiles.append(new_bmp)
 
-    # drawing related functions:
+    # drawing related methods:
 
     def draw_text(self, text, x, y):
         """Piirtää tekstiä Pygamen avulla mihin tahansa peli-ikkunaan.
@@ -208,6 +207,12 @@ class Util:
                 player._Player__draw_player = False
                 player._Player__has_interacted = True
 
+    def level_has_been_solved(self):
+        for player in self.level_util.players:
+            if player._Player__has_interacted == False:
+                return False
+        return True
+
     # main game loop and the methods that support it:
 
     def run(self, is_test = False):
@@ -221,7 +226,7 @@ class Util:
                 self.draw_map()
                 self.draw_ui(self.event_execution_amount)
                 self.draw_coords()
-                if self.level_util.level_has_been_solved():
+                if self.level_has_been_solved():
                     self.draw_text_level_solved()    
                 pygame.display.update()
 
