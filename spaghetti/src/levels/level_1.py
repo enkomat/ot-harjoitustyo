@@ -1,4 +1,5 @@
-from util import Util, Player, Door
+from util import Util
+from gameobjects import *
 
 class Util_Level_1:
     """Pelin ensimmäisen tason työkalupakettiluokka.
@@ -11,7 +12,6 @@ class Util_Level_1:
     """
     def __init__(self):
         self.util = Util(self, "Level_1", 40)
-        
         self.player = Player(self, 1, 1)
         self.players = [self.player]
         

@@ -1,5 +1,6 @@
 import random
-from util import Util, Player, Door
+from util import Util
+from gameobjects import *
 
 class Util_Level_6:
     def __init__(self):

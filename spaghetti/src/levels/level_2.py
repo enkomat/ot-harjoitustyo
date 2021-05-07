@@ -1,4 +1,5 @@
-from util import Util, Player, Door
+from util import Util
+from gameobjects import *
 
 class Util_Level_2:
     """Toisen tason työkalupakkiluokka.
@@ -47,12 +48,6 @@ class Util_Level_2:
         self.g16 = Door(31, 30)
         self.doors = [self.g1, self.g2, self.g3, self.g4, self.g5, self.g6, self.g7, self.g8,
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
-
-    def level_has_been_solved(self):
-        for player in self.players:
-            if player._Player__has_interacted == False:
-                return False
-        return True
 
     def run(self, is_test=False):
         self.util.run(is_test)

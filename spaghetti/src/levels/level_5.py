@@ -1,5 +1,6 @@
 import random
-from util import Util, Player, Door
+from util import Util
+from gameobjects import *
 
 class Util_Level_5:
     def __init__(self):
@@ -32,12 +33,6 @@ class Util_Level_5:
 
         self.door = Door(15, 15)
         self.doors = [self.door]
-
-    def level_has_been_solved(self):
-        for player in self.players:
-            if player._Player__has_interacted == False:
-                return False
-        return True
 
     def run(self, is_test=False):
         self.util.run(is_test)

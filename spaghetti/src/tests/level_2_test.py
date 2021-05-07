@@ -1,5 +1,4 @@
 import unittest
-import pygame
 from levels.level_2 import Level_2
 
 class TestLevel_2(unittest.TestCase):
