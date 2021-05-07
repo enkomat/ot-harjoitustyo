@@ -1,7 +1,6 @@
 import unittest
 import pygame
-import time
-from util import Level_1, Util_Level_1, Util
+from levels.level_1 import Level_1
 
 class TestLevel_1(unittest.TestCase):
     def test_solve_level(self):

@@ -1,6 +1,7 @@
 import unittest
 import pygame
-from util import Level_2, Util_Level_2, Util
+import levels
+from levels.level_2 import Level_2
 
 class TestLevel_2(unittest.TestCase):
     def test_move_players_down(self):

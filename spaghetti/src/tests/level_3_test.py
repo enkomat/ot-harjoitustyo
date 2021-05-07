@@ -1,10 +1,11 @@
 import unittest
 import pygame
-from util import Level_3, Util_Level_3, Util
+import levels
+from levels.level_3 import Level_3
 
 class TestLevel_3(unittest.TestCase):
     def test_move_players_right(self):
-        lvl3 = Level_3()
+        lvl3 = Level_3() 
         util_lvl_3 = lvl3._Level_3__util_level_3
         start_positions_x = []
         for player in util_lvl_3.players:
