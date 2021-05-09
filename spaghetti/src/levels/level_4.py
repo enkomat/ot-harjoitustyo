@@ -27,6 +27,8 @@ class Util_Level_4:
         self.door = Door(15, 15)
         self.doors = [self.door]
 
+        self.walls = []
+
     def run(self, is_test=False):
         self.util.run(is_test)
 

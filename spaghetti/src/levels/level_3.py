@@ -43,6 +43,8 @@ class Util_Level_3:
         self.doors = [self.g1, self.g2, self.g3, self.g4, self.g5, self.g6, self.g7, self.g8,
              self.g9, self.g10, self.g11, self.g12, self.g13, self.g14, self.g15, self.g16]
 
+        self.walls = []
+
     def run(self, is_test=False):
         self.util.run(is_test)
 

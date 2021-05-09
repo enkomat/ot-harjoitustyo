@@ -1,5 +1,4 @@
-from util import Util
-from gameobjects import *
+from util import *
 
 class Util_Level_1:
     """Pelin ensimmäisen tason työkalupakettiluokka.
@@ -12,11 +11,22 @@ class Util_Level_1:
     """
     def __init__(self):
         self.util = Util(self, "Level_1", 40)
-        self.player = Player(self, 1, 1)
+        
+        self.player = Player(self, 21, 22)
         self.players = [self.player]
         
-        self.door = Door(30, 30)
+        self.door = Door(1, 1)
         self.doors = [self.door]
+
+        self.walls = []
+        self.p0 = Pillar(21, 22)
+        self.p1 = Pillar(17, 22)
+        self.p2 = Pillar(17, 18)
+        self.p3 = Pillar(11, 18)
+        self.p4 = Pillar(11, 12)
+        self.p5 = Pillar(21, 12)
+        self.p6 = Pillar(21, 18)
+        self.pillars = [self.p0, self.p1, self.p2, self.p3, self.p4, self.p5, self.p6] 
 
     def run(self, is_test=False):
         self.util.run(is_test)
@@ -32,3 +42,4 @@ class Level_1:
         """Laittaa pelin pyörimään. Poistaa pelaajalta mahdollisuuden suorittaa peliluuppi testimoodissa.
         """
         self.__util_level_1.run()
+

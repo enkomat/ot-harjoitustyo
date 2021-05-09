@@ -35,6 +35,8 @@ class Util_Level_6:
         self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
                self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
 
+        self.walls = []
+
     def run(self, is_test=False):
         self.util.run(is_test)
 
