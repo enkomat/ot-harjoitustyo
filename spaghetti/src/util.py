@@ -11,6 +11,8 @@ class Image_Tiles:
 
         # all the types of tiles currently used in game, to be called from elsewhere:
         self.wall_horizontal = self.__image_tiles[1]
+        self.wall_horizontal_2 = self.__image_tiles[58]
+        self.wall_horizontal_3 = self.__image_tiles[59]
         self.wall_vertical_right = self.__image_tiles[17]
         self.wall_vertical_left = self.__image_tiles[14]
         self.wall_corner_lower_right = self.__image_tiles[31]
@@ -55,6 +57,7 @@ class Wall_Type(Enum):
     CORNER_LOWER_LEFT = 5
     CORNER_UPPER_RIGHT = 6
     CORNER_UPPER_LEFT = 7
+    DOOR = 8
 
 class Game_Event(Enum):
     MOVE_PLAYER_LEFT = 1
@@ -63,6 +66,7 @@ class Game_Event(Enum):
     MOVE_PLAYER_DOWN = 4
     PLAYER_INTERACT = 5
     PLAYER_BUILD_WALL = 6
+    PLAYER_BUILD_DOOR = 7
 
 class Util:
     """Hallinnoi pelin ja pelimoottorin kaikki perustoiminnallisuuksia. Jokaisen tason luokasta referoidaan tätä luokkaa perustoiminallisuuksia varten.
@@ -162,6 +166,8 @@ class Util:
                 self.player_interact(player_reference)
             elif event_type is Game_Event.PLAYER_BUILD_WALL:
                 self.player_build_wall(player_reference)
+            elif event_type is Game_Event.PLAYER_BUILD_DOOR:
+                self.player_build_door(player_reference)
             
             self.event_execution_amount += 1
             self.time_since_last_event_list_execute = 0
@@ -248,7 +254,6 @@ class Util:
         self.draw_text(self.level_name, 16, 16)
         self.draw_text('call_amount=' + str(amt), 16, 32)
 
-
     def draw_level_background(self):
         self.window.blit(self.tiles.level_background, (0, 0))
 
@@ -271,8 +276,12 @@ class Util:
 
     def draw_walls(self):
         for wall in self.level_util.walls:
-            tile_to_draw = self.tiles.wall_horizontal
+            tile_to_draw = None
             
+            if wall.type == Wall_Type.HORIZONTAL:
+                tile_to_draw = self.tiles.wall_horizontal
+            elif wall.type == Wall_Type.DOOR:
+                tile_to_draw = self.tiles.open_door
             if wall.type == Wall_Type.VERTICAL_LEFT:
                 tile_to_draw = self.tiles.wall_vertical_left
             elif wall.type == Wall_Type.VERTICAL_RIGHT:
@@ -285,8 +294,9 @@ class Util:
                 tile_to_draw = self.tiles.wall_corner_lower_right
             elif wall.type == Wall_Type.CORNER_UPPER_RIGHT:
                 tile_to_draw = self.tiles.wall_corner_upper_right
-            
-            self.draw_tile(tile_to_draw, wall.get_position_x(), wall.get_position_y())
+
+            if tile_to_draw:
+                self.draw_tile(tile_to_draw, wall.get_position_x(), wall.get_position_y())
 
     # -----------------------
     # player event related methods:
@@ -295,28 +305,28 @@ class Util:
     def move_player_left(self, player):
         """Liikuttaa pelaajaa yhden ruudun vasemmalle.
         """
-        if self.get_wall_in_position(player.get_position_x() - 1, player.get_position_y()):
+        if self.collision_in_position(player.get_position_x() - 1, player.get_position_y()):
             return
         player._Player__position_x -= 1
 
     def move_player_right(self, player):
         """Liikuttaa pelaajaa yhden ruudun oikealle.
         """
-        if self.get_wall_in_position(player.get_position_x() + 1, player.get_position_y()):
+        if self.collision_in_position(player.get_position_x() + 1, player.get_position_y()):
             return
         player._Player__position_x += 1
 
     def move_player_up(self, player):
         """Liikuttaa pelaajaa yhden ruudun ylöspäin.
         """
-        if self.get_wall_in_position(player.get_position_x(), player.get_position_y() - 1):
+        if self.collision_in_position(player.get_position_x(), player.get_position_y() - 1):
             return
         player._Player__position_y -= 1
 
     def move_player_down(self, player):
         """Liikuttaa pelaajaa yhden ruudun alaspäin.
         """
-        if self.get_wall_in_position(player.get_position_x(), player.get_position_y() + 1):
+        if self.collision_in_position(player.get_position_x(), player.get_position_y() + 1):
             return
         player._Player__position_y += 1
     
@@ -333,6 +343,11 @@ class Util:
         new_wall = Wall(player.get_position_x(), player.get_position_y())
         self.level_util.walls.append(new_wall)
         self.set_correct_wall_type(new_wall)
+
+    def player_build_door(self, player):
+        new_door = Wall(player.get_position_x(), player.get_position_y())
+        new_door.type = Wall_Type.DOOR
+        self.level_util.walls.append(new_door)
 
     # -----------------------
     # interactions with the world:
@@ -351,10 +366,11 @@ class Util:
                 player._Player__has_interacted = True
 
     def level_has_been_solved(self):
-        for player in self.level_util.players:
-            if player._Player__has_interacted == False:
-                return False
-        return True
+        return self.level_util.level_win_condition_satisfied()
+        
+    def collision_in_position(self, x, y):
+        collidable_wall = self.get_wall_in_position(x, y)
+        return collidable_wall and collidable_wall.type is not Wall_Type.DOOR
 
     def set_correct_wall_type(self, new_wall):
         x = new_wall.get_position_x()
@@ -367,11 +383,10 @@ class Util:
         wall_up_right = self.get_wall_in_position(x+1, y-1)
         wall_down_left = self.get_wall_in_position(x-1, y+1)
         wall_down_right = self.get_wall_in_position(x+1, y+1)
-
         
         if not wall_right and not wall_left and not wall_up and not wall_down:
             new_wall.type = Wall_Type.HORIZONTAL
-
+        
         if not wall_right and not wall_left and wall_up and wall_up.type == Wall_Type.VERTICAL_RIGHT:
             new_wall.type = Wall_Type.VERTICAL_RIGHT
         if not wall_right and not wall_left and wall_down and wall_down.type == Wall_Type.VERTICAL_RIGHT:
@@ -387,6 +402,9 @@ class Util:
         if not wall_right and not wall_left and wall_up and wall_up_left:
             new_wall.type = Wall_Type.VERTICAL_RIGHT
             wall_up.type = Wall_Type.CORNER_UPPER_RIGHT
+        if wall_right and wall_down_right and wall_down_right.type == Wall_Type.VERTICAL_RIGHT:
+            new_wall.type = Wall_Type.HORIZONTAL
+            wall_right.type = Wall_Type.CORNER_UPPER_RIGHT
 
         if wall_left and wall_down_left:
             new_wall.type = Wall_Type.HORIZONTAL
@@ -398,16 +416,15 @@ class Util:
         if wall_down and wall_down.type == Wall_Type.VERTICAL_LEFT:
             new_wall.type = Wall_Type.VERTICAL_LEFT
         
-        """
-        if not wall_right and not wall_left and wall_down and wall_down_left:
+        if not wall_right and not wall_left and not wall_up and not wall_down_right and wall_down and wall_down_left:
             new_wall.type = Wall_Type.VERTICAL_RIGHT
             wall_down.type = Wall_Type.CORNER_LOWER_RIGHT
-        """
     
     def get_wall_in_position(self, x, y):
         for wall in self.level_util.walls:
             if wall.get_position_x() == x and wall.get_position_y() == y:
                 return wall
+
 
     # event list addition:
 
@@ -449,6 +466,9 @@ class Player:
 
     def build_wall(self):
         self.__util.add_to_event_list(Game_Event.PLAYER_BUILD_WALL, self)
+    
+    def build_door(self):
+        self.__util.add_to_event_list(Game_Event.PLAYER_BUILD_DOOR, self)
 
     def get_position_x(self):
         return self.__position_x
