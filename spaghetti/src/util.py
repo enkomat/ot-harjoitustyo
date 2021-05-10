@@ -5,7 +5,7 @@ import math
 from enum import Enum
 
 class Image_Tiles:
-    def __init__(self):
+    def __init__(self, level_name):
         self.__image_tiles = []
         self.__load_tile_images()
 
@@ -20,12 +20,19 @@ class Image_Tiles:
         self.wall_corner_upper_right = self.__image_tiles[3]
         self.wall_corner_upper_left = self.__image_tiles[0]
 
+        self.pillar = self.__image_tiles[141]
+        self.line_vertical = self.__image_tiles[143]
+        self.line_horizontal = self.__image_tiles[142]
+
         self.player = self.__image_tiles[6]
         self.closed_door = self.__image_tiles[32]
         self.open_door = self.__image_tiles[33]
         self.background = self.__image_tiles[15]
+
+        self.level_solved = self.__image_tiles[140]
+
         self.level_background = None
-        self.__load_level_background()
+        self.__load_level_background(level_name)
     
     def __load_tile_images(self):
         """Ladataan kaikki pelin grafiikat assets kansiosta image_tiles listaan ja järjestetään ne oikeaan järjestykseen.
@@ -38,16 +45,32 @@ class Image_Tiles:
                 new_png.convert()
                 self.__image_tiles.append(new_png)
     
-    def __load_level_background(self):
+    def __load_level_background(self, level_name):
         """Ladataan kaikki pelin grafiikat assets kansiosta image_tiles listaan ja järjestetään ne oikeaan järjestykseen.
         """
         asset_path = os.path.dirname(os.path.realpath(__file__)) + "/assets/level_backgrounds/"
         for filename in sorted(os.listdir(asset_path)):
             path = asset_path + filename
-            if 'level_1' in path:
+            if level_name in path:
                 new_png = pygame.image.load(path)
                 new_png.convert()
                 self.level_background = new_png
+
+class Game_Sounds:
+    def __init__(self):
+        self.__sounds = []
+        self.__load_game_sounds()
+        self.build = self.__sounds[0]
+        self.hit_wall = self.__sounds[1]
+        self.level_win = self.__sounds[2]
+
+    def __load_game_sounds(self):
+        asset_path = os.path.dirname(os.path.realpath(__file__)) + "/assets/sounds/"
+        for filename in sorted(os.listdir(asset_path)):
+            path = asset_path + filename
+            if 'ogg' in path:
+                new_sound = pygame.mixer.Sound(path)
+                self.__sounds.append(new_sound)
 
 class Wall_Type(Enum):
     HORIZONTAL = 1
@@ -94,7 +117,7 @@ class Util:
         self.width = self.tile_pixel_size * 32
         self.height = self.tile_pixel_size * 32
         self.window = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("spaghetti")
+        pygame.display.set_caption("Spaghetti Master - " + level_name)
         self.ui_height = self.tile_pixel_size * 2
         
         pygame.font.init()
@@ -105,7 +128,8 @@ class Util:
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.background_color = (0, 0, 0)  # change from black to more grey
 
-        self.tiles = Image_Tiles()
+        self.tiles = Image_Tiles(level_name)
+        self.sounds = Game_Sounds()
 
         self.event_list = []
         self.event_parameter_list = []
@@ -118,6 +142,7 @@ class Util:
 
         self.level_util = level_util
         self.level_name = level_name
+        self.level_solved = False
 
     # -----------------------
     # main game loop:
@@ -179,7 +204,7 @@ class Util:
         #self.draw_ui(self.event_execution_amount)
         #self.draw_coords()
         if self.level_has_been_solved():
-            self.draw_text_level_solved()
+            self.draw_tile(self.tiles.level_solved, 13, 14)
         pygame.display.update()
 
     # -----------------------
@@ -189,7 +214,8 @@ class Util:
         self.window.fill(self.background_color)
         # self.draw_background_tiles()
         self.draw_level_background()
-        self.draw_pillar_texts()
+        self.draw_construction_lines()
+        self.draw_pillars()
         self.draw_walls()
         self.draw_doors()
         self.draw_players()
@@ -249,6 +275,43 @@ class Util:
         y *= self.tile_pixel_size
         #y += self.ui_height
         self.window.blit(tile, (x, y))
+
+    def draw_pillars(self):
+        for pillar in self.level_util.pillars:
+            self.draw_tile(self.tiles.pillar, pillar.get_position_x(), pillar.get_position_y())
+        self.draw_pillar_texts()
+
+    def draw_construction_lines(self):
+        for i in range(len(self.level_util.pillars)):
+            if i == len(self.level_util.pillars)-1:
+                start_x = self.level_util.pillars[i].get_position_x()
+                end_x = self.level_util.pillars[0].get_position_x()
+            else:
+                start_x = self.level_util.pillars[i].get_position_x()
+                end_x = self.level_util.pillars[i+1].get_position_x()
+            if start_x == end_x:
+                if i == len(self.level_util.pillars)-1:
+                    start_y = self.level_util.pillars[i].get_position_y()
+                    end_y = self.level_util.pillars[0].get_position_y()
+                else:
+                    start_y = self.level_util.pillars[i].get_position_y()
+                    end_y = self.level_util.pillars[i+1].get_position_y()
+                y = start_y
+                while y != end_y:
+                    self.draw_tile(self.tiles.line_vertical, start_x, y)
+                    if end_y > y:
+                        y += 1
+                    else:
+                        y -= 1
+            else:
+                start_y = self.level_util.pillars[i].get_position_y()
+                x = start_x
+                while x != end_x:
+                    self.draw_tile(self.tiles.line_horizontal, x, start_y)
+                    if end_x > x:
+                        x += 1
+                    else:
+                        x -= 1
 
     def draw_ui(self, amt):
         self.draw_text(self.level_name, 16, 16)
@@ -340,11 +403,13 @@ class Util:
             self.open_door(player)
 
     def player_build_wall(self, player):
+        pygame.mixer.Sound.play(self.sounds.build)
         new_wall = Wall(player.get_position_x(), player.get_position_y())
         self.level_util.walls.append(new_wall)
         self.set_correct_wall_type(new_wall)
 
     def player_build_door(self, player):
+        pygame.mixer.Sound.play(self.sounds.build)
         new_door = Wall(player.get_position_x(), player.get_position_y())
         new_door.type = Wall_Type.DOOR
         self.level_util.walls.append(new_door)
@@ -366,11 +431,19 @@ class Util:
                 player._Player__has_interacted = True
 
     def level_has_been_solved(self):
-        return self.level_util.level_win_condition_satisfied()
-        
+        if self.level_util.level_win_condition_satisfied():
+            if self.level_solved == False:
+                pygame.mixer.Sound.play(self.sounds.level_win)
+                self.level_solved = True
+            return True
+        return False        
+
     def collision_in_position(self, x, y):
         collidable_wall = self.get_wall_in_position(x, y)
-        return collidable_wall and collidable_wall.type is not Wall_Type.DOOR
+        if collidable_wall and collidable_wall.type is not Wall_Type.DOOR:
+            pygame.mixer.Sound.play(self.sounds.hit_wall)
+            return True
+        return False
 
     def set_correct_wall_type(self, new_wall):
         x = new_wall.get_position_x()

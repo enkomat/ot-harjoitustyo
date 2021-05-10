@@ -190,8 +190,7 @@ class Util_Level_1:
         self.player = Player(self, 21, 22)
         self.players = [self.player]
         
-        self.door = Door(1, 1)
-        self.doors = [self.door]
+        self.doors = []
 
         self.walls = []
 
@@ -215,8 +214,7 @@ class Util_Level_1:
         solution_coordinates = []
         # check all needed walls exist
         for line in level_solution_list:
-            print(line)
-            
+
             if index == 1:
                 x = int(line)
             elif index == 2:

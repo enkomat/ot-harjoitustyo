@@ -14,7 +14,7 @@ class TestLevel_1(unittest.TestCase):
                 lvl1.player.build_door()
             else:
                 lvl1.player.build_wall()
-        for i in range(5):
+        for i in range(4):
             lvl1.player.move_up()
             lvl1.player.build_wall()
         for i in range(6):
@@ -43,6 +43,7 @@ class TestLevel_1(unittest.TestCase):
         lvl1.player.build_door()
         lvl1.player.move_left()
         lvl1.player.build_wall()
+        lvl1.player.move_down()
         lvl1.player.move_down()
         util_lvl_1.run()
         self.assertEqual(True, False)
