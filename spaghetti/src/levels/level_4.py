@@ -1,9 +1,8 @@
-from util import Util
-from gameobjects import *
+from game_objects import *
 
 class Util_Level_4:
-    def __init__(self):
-        self.util = Util(self, "Level_4")
+    def __init__(self, util):
+        self.util = util
 
         self.p1 = Player(self, 1, 1)
         self.p2 = Player(self, 3, 1)
@@ -29,13 +28,9 @@ class Util_Level_4:
 
         self.walls = []
 
-    def run(self, is_test=False):
-        self.util.run(is_test)
+        self.level = Level_4(self)
 
 class Level_4:
-    def __init__(self, players = []):
-        self.__util_level_4 = Util_Level_4()
+    def __init__(self, level_util):
+        self.__util_level_4 = level_util
         self.players = self.__util_level_4.players
-
-    def run(self):
-        self.__util_level_4.run()

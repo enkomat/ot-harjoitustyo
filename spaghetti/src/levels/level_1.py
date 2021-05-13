@@ -1,4 +1,4 @@
-from util import *
+from game_objects import *
 
 level_solution = """
 20
@@ -184,9 +184,9 @@ class Util_Level_1:
         player_position_y = pelaajan paikka kartalla y suunnassa
         door = tason ovi ja sen paikka parametreina konstruktorille
     """
-    def __init__(self):
-        self.util = Util(self, "Level_1", 40)
-        
+    def __init__(self, util):
+        self.util = util
+
         self.player = Player(self, 21, 22)
         self.players = [self.player]
         
@@ -202,8 +202,8 @@ class Util_Level_1:
         self.p5 = Pillar(21, 12)
         self.p6 = Pillar(21, 18)
         self.pillars = [self.p0, self.p1, self.p2, self.p3, self.p4, self.p5, self.p6] 
-        self.level_win_condition_satisfied()
 
+        self.level = Level_1(self)
 
     def level_win_condition_satisfied(self):
         level_solution_list = level_solution.splitlines()
@@ -229,8 +229,12 @@ class Util_Level_1:
                 index = 0
 
         for coord in solution_coordinates:
-            if not self.util.get_wall_in_position(coord[0], coord[1]):
-                return False
+            wall_found_in_position = False
+            for wall in self.walls:
+                if coord[0] == wall.get_position_x() and coord[1] == wall.get_position_y():
+                    wall_found_in_position = True
+            if wall_found_in_position == False:
+                    return False
 
         # check if a wall exists in wrong place
         for wall in self.walls:
@@ -246,21 +250,11 @@ class Util_Level_1:
     
         return True
 
-            
-
-    def run(self, is_test=False):
-        self.util.run(is_test)
-
 class Level_1:
     """Pelaajalle avoinna oleva luokka jonka kautta kutsutaan tason ratkaisemiseen tarkoitettuja metodeja.
     """
-    def __init__(self):
-        self.__util_level_1 = Util_Level_1()
+    def __init__(self, level_util):
+        self.__util_level_1 = level_util
         self.player = self.__util_level_1.player
         self.pillars = self.__util_level_1.pillars
-
-    def run(self):
-        """Laittaa pelin pyörimään. Poistaa pelaajalta mahdollisuuden suorittaa peliluuppi testimoodissa.
-        """
-        self.__util_level_1.run()
 

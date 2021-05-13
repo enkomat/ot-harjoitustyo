@@ -12,7 +12,7 @@ class TestLevel_5(unittest.TestCase):
                 dist_y = abs(player.get_position_y() - 15)
                 
                 for i in range(dist_x):
-                    if player.get_position_x() > 15:        
+                    if player.get_position_x() > 15:     
                         player.move_left()
                     else:
                         player.move_right()

@@ -1,8 +1,25 @@
 import pygame
 import os
-import random
 import math
+import importlib
 from enum import Enum
+
+from game_event import Game_Event
+from wall_type import Wall_Type
+from game_objects import *
+
+from levels.level_1 import Util_Level_1
+from levels.level_2 import Util_Level_2
+from levels.level_3 import Util_Level_3
+from levels.level_4 import Util_Level_4
+from levels.level_5 import Util_Level_5
+from levels.level_6 import Util_Level_6
+from level_1_solution import Level_1_Solution
+from level_2_solution import Level_2_Solution
+from level_3_solution import Level_3_Solution
+from level_4_solution import Level_4_Solution
+from level_5_solution import Level_5_Solution
+from level_6_solution import Level_6_Solution
 
 class Image_Tiles:
     def __init__(self, level_name):
@@ -31,11 +48,18 @@ class Image_Tiles:
 
         self.level_solved = self.__image_tiles[140]
 
-        self.level_background = None
-        self.__load_level_background(level_name)
+        self.__icons = []
+        self.__load_icons()
+        self.play_icon = self.__icons[0]
+        self.pause_icon = self.__icons[1]
+        self.reset_icon = self.__icons[2]
+        self.menu_icon = self.__icons[3]
+
+        self.level_backgrounds = []
+        self.__load_level_backgrounds()
     
     def __load_tile_images(self):
-        """Ladataan kaikki pelin grafiikat assets kansiosta image_tiles listaan ja järjestetään ne oikeaan järjestykseen.
+        """Ladataan kaikki pelin spritesheet grafiikat assets kansiosta image_tiles listaan ja järjestetään ne oikeaan järjestykseen.
         """
         asset_path = os.path.dirname(os.path.realpath(__file__)) + "/assets/"
         for filename in sorted(os.listdir(asset_path)):
@@ -45,16 +69,23 @@ class Image_Tiles:
                 new_png.convert()
                 self.__image_tiles.append(new_png)
     
-    def __load_level_background(self, level_name):
-        """Ladataan kaikki pelin grafiikat assets kansiosta image_tiles listaan ja järjestetään ne oikeaan järjestykseen.
-        """
+    def __load_icons(self):
+        asset_path = os.path.dirname(os.path.realpath(__file__)) + "/assets/icons/"
+        for filename in sorted(os.listdir(asset_path)):
+            path = asset_path + filename
+            if 'png' in path:
+                new_png = pygame.image.load(path)
+                new_png.convert()
+                self.__icons.append(new_png)
+    
+    def __load_level_backgrounds(self):
         asset_path = os.path.dirname(os.path.realpath(__file__)) + "/assets/level_backgrounds/"
         for filename in sorted(os.listdir(asset_path)):
             path = asset_path + filename
-            if level_name in path:
+            if 'png' in path:
                 new_png = pygame.image.load(path)
                 new_png.convert()
-                self.level_background = new_png
+                self.level_backgrounds.append(new_png)
 
 class Game_Sounds:
     def __init__(self):
@@ -72,24 +103,9 @@ class Game_Sounds:
                 new_sound = pygame.mixer.Sound(path)
                 self.__sounds.append(new_sound)
 
-class Wall_Type(Enum):
-    HORIZONTAL = 1
-    VERTICAL_RIGHT = 2
-    VERTICAL_LEFT = 3
-    CORNER_LOWER_RIGHT = 4
-    CORNER_LOWER_LEFT = 5
-    CORNER_UPPER_RIGHT = 6
-    CORNER_UPPER_LEFT = 7
-    DOOR = 8
-
-class Game_Event(Enum):
-    MOVE_PLAYER_LEFT = 1
-    MOVE_PLAYER_RIGHT = 2
-    MOVE_PLAYER_UP = 3
-    MOVE_PLAYER_DOWN = 4
-    PLAYER_INTERACT = 5
-    PLAYER_BUILD_WALL = 6
-    PLAYER_BUILD_DOOR = 7
+class Game_State(Enum):
+    MAIN_MENU = 1
+    PLAYING = 2
 
 class Util:
     """Hallinnoi pelin ja pelimoottorin kaikki perustoiminnallisuuksia. Jokaisen tason luokasta referoidaan tätä luokkaa perustoiminallisuuksia varten.
@@ -110,14 +126,14 @@ class Util:
         event_parameter_list = tähän listaan voi syöttää mahdollisia parametreja tiettyyn metodikutsuun joka tulee pelaajan koodista
         fps = pelin frames per second
     """
-    def __init__(self, level_util, level_name, game_speed = 2):
+    def __init__(self):
         pygame.init()
-
+        level_name = "Level_1" # get this from level util
         self.tile_pixel_size = 24
         self.width = self.tile_pixel_size * 32
         self.height = self.tile_pixel_size * 32
         self.window = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Spaghetti Master - " + level_name)
+        pygame.display.set_caption("Spaghetti Master")
         self.ui_height = self.tile_pixel_size * 2
         
         pygame.font.init()
@@ -130,34 +146,62 @@ class Util:
 
         self.tiles = Image_Tiles(level_name)
         self.sounds = Game_Sounds()
+        self.sound_on = True
 
         self.event_list = []
         self.event_parameter_list = []
         self.event_execution_amount = 0
         self.time_since_last_event_list_execute = 0.0
+        self.event_index = 0
 
         self.fps = 60
         self.clock = pygame.time.Clock()
-        self.game_speed = game_speed
+        self.game_speed = 40
 
-        self.level_util = level_util
+        self.levels = [Util_Level_1(self), Util_Level_2(self), Util_Level_3(self), Util_Level_4(self), Util_Level_5(self), Util_Level_6(self)]
+
+        self.level_util = self.levels[0]
         self.level_name = level_name
+        self.level_background = self.tiles.level_backgrounds[0]
         self.level_solved = False
+        self.game_paused = True
+        self.play_button = self.tiles.play_icon # swaps between pause and play
+        self.game_state = Game_State.MAIN_MENU
+
+        center_x = self.width / 2
+        self.play_button_position = (center_x - 25, self.height - 60)
+        self.reset_button_position = (center_x + 25, self.height - 60)
+        self.menu_button_position = (self.width - 60, self.height - 60)
+
+        self.solution = Level_1_Solution(self.level_util.level)
+        
+        self.run()
 
     # -----------------------
     # main game loop:
     def run(self, is_test = False):
-        self.draw_new_frame() # starting frame is drawn before any event is processed, otherwise screen will be black
-
-        while self.should_run(is_test):
-            # timekeeping variables
-            self.clock.tick(self.fps)
-            self.time_since_last_event_list_execute += self.clock.tick(self.fps)
-            
-            # only update map if an event has been executed
-            if self.execute_next_method_in_event_list():
-                self.draw_new_frame()
-
+        run = True
+        while run:
+            if self.game_state == Game_State.MAIN_MENU:
+                self.draw_main_menu()
+                # if the quit button is pressed in events, the while loop should break
+                if self.handle_main_menu_events() == False:
+                    break
+            elif self.game_state == Game_State.PLAYING:
+                if self.should_run(is_test): # automatic window closing for tests
+                    # timekeeping variables
+                    self.clock.tick(self.fps)
+                    self.time_since_last_event_list_execute += self.clock.tick(self.fps)
+                     # if the quit button is pressed in events, the while loop should break
+                    if self.handle_playing_events():
+                        self.draw_current_level() # view is updated so buttons can be updated
+                    else:
+                        break
+                    # only update map if an event has been executed
+                    if self.execute_next_method_in_event_list():
+                        self.draw_current_level()
+                else:
+                    break
         # quit game after the game loop has been terminated
         pygame.quit()
 
@@ -165,20 +209,152 @@ class Util:
     # methods that are called from main game loop:
 
     def should_run(self, is_test):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
         if is_test and len(self.event_list) == 0:
             return False
         return True
 
+    def handle_playing_events(self):
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                return False
+            elif event.type == pygame.MOUSEBUTTONUP:
+                mouse_position = pygame.mouse.get_pos()
+                # currently defined button positions are their upper left corner, so center is new variable
+                play_button_center = (381, 730)
+                reset_button_center = (435, 735)
+                menu_button_center = (736, 733)
+                if self.distance(mouse_position, play_button_center) < 20:
+                    self.game_paused = not self.game_paused
+                    if self.game_paused:
+                        self.play_button = self.tiles.play_icon
+                    else:
+                        self.play_button = self.tiles.pause_icon
+                elif self.distance(mouse_position, reset_button_center) < 20:
+                    self.reload_events()
+                    self.reset_game_state()
+                elif self.distance(mouse_position, menu_button_center) < 20:
+                    self.game_state = Game_State.MAIN_MENU
+                    self.game_paused = True
+                    self.play_button = self.tiles.play_icon
+        return True
+    
+    def handle_main_menu_events(self):
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                return False
+            elif event.type == pygame.MOUSEBUTTONUP:
+                mouse_position = pygame.mouse.get_pos()
+                # currently defined button positions are their upper left corner, so center is new variable
+                level_1_button_center = (45, 35)
+                level_2_button_center = (45, 60)
+                level_3_button_center = (450, 60)
+                level_4_button_center = (450, 60)
+                level_5_button_center = (450, 60)
+                level_6_button_center = (450, 60)
+                print(mouse_position)
+                if self.distance(mouse_position, level_1_button_center) < 20:
+                    self.game_state = Game_State.PLAYING
+                    self.level_util = self.levels[0]
+                    self.level_background = self.tiles.level_backgrounds[0]
+                    self.solution = Level_1_Solution(self.level_util.level)
+                    self.reload_events()
+                    self.draw_current_level()
+                elif self.distance(mouse_position, level_2_button_center) < 20:
+                    self.game_state = Game_State.PLAYING
+                    self.level_util = self.levels[1]
+                    self.level_background = self.tiles.level_backgrounds[1]
+                    self.solution = Level_2_Solution(self.level_util.level)
+                    self.reload_events()
+                    self.draw_current_level()
+                elif self.distance(mouse_position, level_3_button_center) < 20:
+                    self.game_state = Game_State.PLAYING
+                    self.level_util = self.levels[2]
+                    self.level_background = self.tiles.level_backgrounds[2]
+                    self.solution = Level_3_Solution(self.level_util.level)
+                    self.reload_events()
+                    self.draw_current_level()
+                elif self.distance(mouse_position, level_4_button_center) < 20:
+                    self.game_state = Game_State.PLAYING
+                    self.level_util = self.levels[3]
+                    self.level_background = self.tiles.level_backgrounds[3]
+                    self.solution = Level_4_Solution(self.level_util.level)
+                    self.reload_events()
+                    self.draw_current_level()
+                elif self.distance(mouse_position, level_5_button_center) < 20:
+                    self.game_state = Game_State.PLAYING
+                    self.level_util = self.levels[4]
+                    self.level_background = self.tiles.level_backgrounds[4]
+                    self.solution = Level_5_Solution(self.level_util.level)
+                    self.reload_events()
+                    self.draw_current_level()
+                elif self.distance(mouse_position, level_6_button_center) < 20:
+                    self.game_state = Game_State.PLAYING
+                    self.level_util = self.levels[5]
+                    self.level_background = self.tiles.level_backgrounds[5]
+                    self.solution = Level_6_Solution(self.level_util.level)
+                    self.reload_events()
+                    self.draw_current_level()
+        return True
+
+    def reload_events(self):
+        if self.level_util == self.levels[0]:
+            self.reload_level_1_events()
+        elif self.level_util == self.levels[1]:
+            self.reload_level_2_events()
+
+    def reload_level_1_events(self):
+        self.event_list.clear()
+        import level_1_solution
+        importlib.reload(level_1_solution)
+        from level_1_solution import Level_1_Solution
+        self.solution = Level_1_Solution(self.level_util.level)
+
+    def reload_level_2_events(self):
+        self.event_list.clear()
+        import level_2_solution
+        importlib.reload(level_2_solution)
+        from level_2_solution import Level_2_Solution
+        self.solution = Level_2_Solution(self.level_util.level)
+
+    def reload_level_3_events(self):
+        self.event_list.clear()
+        import level_3_solution
+        importlib.reload(level_3_solution)
+        from level_3_solution import Level_3_Solution
+        self.solution = Level_3_Solution(self.level_util.level)
+
+    def reload_level_4_events(self):
+        self.event_list.clear()
+        import level_4_solution
+        importlib.reload(level_4_solution)
+        from level_4_solution import Level_2_Solution
+        self.solution = Level_4_Solution(self.level_util.level)
+
+    def reload_level_5_events(self):
+        self.event_list.clear()
+        import level_5_solution
+        importlib.reload(level_5_solution)
+        from level_5_solution import Level_5_Solution
+        self.solution = Level_5_Solution(self.level_util.level)
+
+    def reload_level_6_events(self):
+        self.event_list.clear()
+        import level_6_solution
+        importlib.reload(level_6_solution)
+        from level_6_solution import Level_6_Solution
+        self.solution = Level_6_Solution(self.level_util.level)
+
     def execute_next_method_in_event_list(self):
         """Suorittaa seuraavan metodin pelin aikana suoritettavien metodien listasta.
         """
-        if(len(self.event_list) > 0 and self.time_since_last_event_list_execute > self.game_speed):
-            event_type = self.event_list.pop(0)
-            player_reference = self.event_parameter_list.pop(0)
-            
+        if self.game_paused:
+            return
+
+        if self.event_index < len(self.event_list) and self.time_since_last_event_list_execute > self.game_speed:
+            event_type = self.event_list[self.event_index]
+            player_reference = self.event_parameter_list[self.event_index]
             if event_type is Game_Event.MOVE_PLAYER_RIGHT:
                 self.move_player_right(player_reference)
             elif event_type is Game_Event.MOVE_PLAYER_LEFT:
@@ -196,15 +372,31 @@ class Util:
             
             self.event_execution_amount += 1
             self.time_since_last_event_list_execute = 0
+            self.event_index += 1
             return True
+        # when all the events have executed, the game is paused
+        if self.event_index == len(self.event_list):
+            self.play_button = self.tiles.play_icon
+            self.game_paused = True
+            self.draw_current_level()
         return False
 
-    def draw_new_frame(self):
+    def draw_current_level(self):
         self.draw_map()
         #self.draw_ui(self.event_execution_amount)
         #self.draw_coords()
         if self.level_has_been_solved():
             self.draw_tile(self.tiles.level_solved, 13, 14)
+        pygame.display.update()
+
+    def draw_main_menu(self):
+        self.window.fill(self.background_color)
+        self.draw_text("Level 1", 25, 25)
+        self.draw_text("Level 2", 25, 50)
+        self.draw_text("Level 3", 25, 75)
+        self.draw_text("Level 4", 25, 100)
+        self.draw_text("Level 5", 25, 125)
+        self.draw_text("Level 6", 25, 150)
         pygame.display.update()
 
     # -----------------------
@@ -216,10 +408,11 @@ class Util:
         self.draw_level_background()
         self.draw_construction_lines()
         self.draw_pillars()
-        self.draw_walls()
         self.draw_doors()
+        self.draw_walls()
         self.draw_players()
         self.draw_coords()
+        self.draw_buttons()
 
     def draw_text(self, text, x, y, color = (255, 255, 255)):
         """Piirtää tekstiä Pygamen avulla mihin tahansa peli-ikkunaan.
@@ -262,8 +455,13 @@ class Util:
     def draw_pillar_texts(self):
         i = 0
         for pillar in self.level_util.pillars:
-            self.draw_text(str(i), pillar.get_position_x() * self.tile_pixel_size + 9, pillar.get_position_y() * self.tile_pixel_size + 4, (0, 0, 0))
+            self.draw_text(str(i), pillar._Pillar__position_x * self.tile_pixel_size + 9, pillar._Pillar__position_y * self.tile_pixel_size + 4, (0, 0, 0))
             i += 1
+
+    def draw_buttons(self):
+        self.window.blit(self.play_button, (self.play_button_position[0], self.play_button_position[1]))
+        self.window.blit(self.tiles.reset_icon, (self.reset_button_position[0], self.reset_button_position[1]))
+        self.window.blit(self.tiles.menu_icon, (self.menu_button_position[0], self.menu_button_position[1]))
 
     def draw_tile(self, tile, x, y):
         """Piirtää avoimen oven.
@@ -278,24 +476,24 @@ class Util:
 
     def draw_pillars(self):
         for pillar in self.level_util.pillars:
-            self.draw_tile(self.tiles.pillar, pillar.get_position_x(), pillar.get_position_y())
+            self.draw_tile(self.tiles.pillar, pillar._Pillar__position_x, pillar._Pillar__position_y)
         self.draw_pillar_texts()
 
     def draw_construction_lines(self):
         for i in range(len(self.level_util.pillars)):
             if i == len(self.level_util.pillars)-1:
-                start_x = self.level_util.pillars[i].get_position_x()
-                end_x = self.level_util.pillars[0].get_position_x()
+                start_x = self.level_util.pillars[i]._Pillar__position_x
+                end_x = self.level_util.pillars[0]._Pillar__position_x
             else:
-                start_x = self.level_util.pillars[i].get_position_x()
-                end_x = self.level_util.pillars[i+1].get_position_x()
+                start_x = self.level_util.pillars[i]._Pillar__position_x
+                end_x = self.level_util.pillars[i+1]._Pillar__position_x
             if start_x == end_x:
                 if i == len(self.level_util.pillars)-1:
-                    start_y = self.level_util.pillars[i].get_position_y()
-                    end_y = self.level_util.pillars[0].get_position_y()
+                    start_y = self.level_util.pillars[i]._Pillar__position_y
+                    end_y = self.level_util.pillars[0]._Pillar__position_y
                 else:
-                    start_y = self.level_util.pillars[i].get_position_y()
-                    end_y = self.level_util.pillars[i+1].get_position_y()
+                    start_y = self.level_util.pillars[i]._Pillar__position_y
+                    end_y = self.level_util.pillars[i+1]._Pillar__position_y
                 y = start_y
                 while y != end_y:
                     self.draw_tile(self.tiles.line_vertical, start_x, y)
@@ -304,7 +502,7 @@ class Util:
                     else:
                         y -= 1
             else:
-                start_y = self.level_util.pillars[i].get_position_y()
+                start_y = self.level_util.pillars[i]._Pillar__position_y
                 x = start_x
                 while x != end_x:
                     self.draw_tile(self.tiles.line_horizontal, x, start_y)
@@ -318,7 +516,7 @@ class Util:
         self.draw_text('call_amount=' + str(amt), 16, 32)
 
     def draw_level_background(self):
-        self.window.blit(self.tiles.level_background, (0, 0))
+        self.window.blit(self.level_background, (0, 0))
 
     def draw_background_tiles(self):
         for x in range(32):
@@ -359,7 +557,7 @@ class Util:
                 tile_to_draw = self.tiles.wall_corner_upper_right
 
             if tile_to_draw:
-                self.draw_tile(tile_to_draw, wall.get_position_x(), wall.get_position_y())
+                self.draw_tile(tile_to_draw, wall._Wall__position_x, wall._Wall__position_y)
 
     # -----------------------
     # player event related methods:
@@ -368,28 +566,28 @@ class Util:
     def move_player_left(self, player):
         """Liikuttaa pelaajaa yhden ruudun vasemmalle.
         """
-        if self.collision_in_position(player.get_position_x() - 1, player.get_position_y()):
+        if self.collision_in_position(player._Player__position_x - 1, player._Player__position_y):
             return
         player._Player__position_x -= 1
 
     def move_player_right(self, player):
         """Liikuttaa pelaajaa yhden ruudun oikealle.
         """
-        if self.collision_in_position(player.get_position_x() + 1, player.get_position_y()):
+        if self.collision_in_position(player._Player__position_x + 1, player._Player__position_y):
             return
         player._Player__position_x += 1
 
     def move_player_up(self, player):
         """Liikuttaa pelaajaa yhden ruudun ylöspäin.
         """
-        if self.collision_in_position(player.get_position_x(), player.get_position_y() - 1):
+        if self.collision_in_position(player._Player__position_x, player._Player__position_y - 1):
             return
         player._Player__position_y -= 1
 
     def move_player_down(self, player):
         """Liikuttaa pelaajaa yhden ruudun alaspäin.
         """
-        if self.collision_in_position(player.get_position_x(), player.get_position_y() + 1):
+        if self.collision_in_position(player._Player__position_x, player._Player__position_y + 1):
             return
         player._Player__position_y += 1
     
@@ -403,29 +601,37 @@ class Util:
             self.open_door(player)
 
     def player_build_wall(self, player):
-        pygame.mixer.Sound.play(self.sounds.build)
-        new_wall = Wall(player.get_position_x(), player.get_position_y())
+        if self.get_wall_in_position(player._Player__position_x,player._Player__position_y):
+            return
+        self.play_sound(self.sounds.build)
+        new_wall = Wall(player._Player__position_x, player._Player__position_y)
         self.level_util.walls.append(new_wall)
         self.set_correct_wall_type(new_wall)
 
     def player_build_door(self, player):
-        pygame.mixer.Sound.play(self.sounds.build)
-        new_door = Wall(player.get_position_x(), player.get_position_y())
+        self.play_sound(self.sounds.build)
+        new_door = Wall(player._Player__position_x, player._Player__position_y)
         new_door.type = Wall_Type.DOOR
         self.level_util.walls.append(new_door)
+
+    def player_get_position_x(self, player):
+        return player._Player__position_x
+    
+    def player_get_position_y(self, player):
+        return player._Player__position_y
 
     # -----------------------
     # interactions with the world:
 
     def over_door(self, player):
         for door in self.level_util.doors:
-            if (door.get_position_x() == player.get_position_x()) and (door.get_position_y() == player.get_position_y()):
+            if (door._Door__position_x == player._Player__position_x) and (door._Door__position_y == player._Player__position_y):
                 return True
         return False
 
     def open_door(self, player):
         for door in self.level_util.doors:
-            if (door.get_position_x() == player.get_position_x()) and (door.get_position_y() == player.get_position_y()):
+            if (door._Door__position_x == player._Player__position_x) and (door._Door__position_y == player._Player__position_y):
                 door._Door__is_open = True
                 player._Player__draw_player = False
                 player._Player__has_interacted = True
@@ -433,7 +639,7 @@ class Util:
     def level_has_been_solved(self):
         if self.level_util.level_win_condition_satisfied():
             if self.level_solved == False:
-                pygame.mixer.Sound.play(self.sounds.level_win)
+                self.play_sound(self.sounds.level_win)
                 self.level_solved = True
             return True
         return False        
@@ -441,13 +647,13 @@ class Util:
     def collision_in_position(self, x, y):
         collidable_wall = self.get_wall_in_position(x, y)
         if collidable_wall and collidable_wall.type is not Wall_Type.DOOR:
-            pygame.mixer.Sound.play(self.sounds.hit_wall)
+            self.play_sound(self.sounds.hit_wall)
             return True
         return False
 
     def set_correct_wall_type(self, new_wall):
-        x = new_wall.get_position_x()
-        y = new_wall.get_position_y()
+        x = new_wall._Wall__position_x
+        y = new_wall._Wall__position_y
         wall_right = self.get_wall_in_position(x+1, y)
         wall_left = self.get_wall_in_position(x-1, y)
         wall_up = self.get_wall_in_position(x, y-1)
@@ -495,9 +701,12 @@ class Util:
     
     def get_wall_in_position(self, x, y):
         for wall in self.level_util.walls:
-            if wall.get_position_x() == x and wall.get_position_y() == y:
+            if wall._Wall__position_x == x and wall._Wall__position_y == y:
                 return wall
 
+    def play_sound(self, sound):
+        if self.sound_on: 
+            pygame.mixer.Sound.play(sound)
 
     # event list addition:
 
@@ -511,77 +720,36 @@ class Util:
         self.event_list.append(method_name)
         self.event_parameter_list.append(method_parameter)
 
-class Player:
-    """Myöhemmissä tasoissa käytetty luokka, joka mahdollistaa sen, että tasoa ratkottaesta voi ohjata useampaa pelaajaa.
-    """
-    def __init__(self, level_util, position_x, position_y):
-        self.__level_util = level_util
-        self.__util = self.__level_util.util
-        self.__position_x = position_x
-        self.__position_y = position_y
-        self.__has_interacted = False
-        self.__draw_player = True
+    def get_game_state(self): 
+        self.sound_on = False
+        for i in range(len(self.event_list)):
+            event_type = self.event_list[i]
+            player_reference = self.event_parameter_list[i]
+            
+            if event_type is Game_Event.MOVE_PLAYER_RIGHT:
+                self.move_player_right(player_reference)
+            elif event_type is Game_Event.MOVE_PLAYER_LEFT:
+                self.move_player_left(player_reference)
+            elif event_type is Game_Event.MOVE_PLAYER_UP:
+                self.move_player_up(player_reference)
+            elif event_type is Game_Event.MOVE_PLAYER_DOWN:
+                self.move_player_down(player_reference)
+            elif event_type is Game_Event.PLAYER_INTERACT:
+                self.player_interact(player_reference)
+            elif event_type is Game_Event.PLAYER_BUILD_WALL:
+                self.player_build_wall(player_reference)
+            elif event_type is Game_Event.PLAYER_BUILD_DOOR:
+                self.player_build_door(player_reference)
+        self.sound_on = True
 
-    def move_left(self):
-        self.__util.add_to_event_list(Game_Event.MOVE_PLAYER_LEFT, self)
+    def reset_game_state(self):
+        self.game_paused = True
+        self.play_button = self.tiles.play_icon
+        self.level_util.walls.clear()
+        for player in self.level_util.players:
+            player._Player__position_x = player._Player__original_x
+            player._Player__position_y = player._Player__original_y
+        self.event_index = 0
 
-    def move_right(self):
-        self.__util.add_to_event_list(Game_Event.MOVE_PLAYER_RIGHT, self)
-
-    def move_up(self):
-        self.__util.add_to_event_list(Game_Event.MOVE_PLAYER_UP, self)
-
-    def move_down(self):
-        self.__util.add_to_event_list(Game_Event.MOVE_PLAYER_DOWN, self)
-
-    def interact(self):
-        self.__util.add_to_event_list(Game_Event.PLAYER_INTERACT, self)
-
-    def build_wall(self):
-        self.__util.add_to_event_list(Game_Event.PLAYER_BUILD_WALL, self)
-    
-    def build_door(self):
-        self.__util.add_to_event_list(Game_Event.PLAYER_BUILD_DOOR, self)
-
-    def get_position_x(self):
-        return self.__position_x
-
-    def get_position_y(self):
-        return self.__position_y
-
-class Door:
-    """Luo oven jonka paikan pelaaja voi hakea.
-    """
-    def __init__(self, position_x, position_y):
-        self.__position_x = position_x
-        self.__position_y = position_y
-        self.__is_open = False
-    
-    def get_position_x(self):
-        return self.__position_x
-    
-    def get_position_y(self):
-        return self.__position_y
-
-class Wall:
-    def __init__(self, position_x, position_y, wall_type = Wall_Type.HORIZONTAL):
-        self.__position_x = position_x
-        self.__position_y = position_y
-        self.type = wall_type
-    
-    def get_position_x(self):
-        return self.__position_x
-    
-    def get_position_y(self):
-        return self.__position_y
-
-class Pillar:
-    def __init__(self, position_x, position_y):
-        self.__position_x = position_x
-        self.__position_y = position_y
-    
-    def get_position_x(self):
-        return self.__position_x
-    
-    def get_position_y(self):
-        return self.__position_y
+    def distance(self, p1, p2):
+        return math.sqrt(((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2))

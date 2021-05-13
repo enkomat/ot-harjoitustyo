@@ -1,10 +1,9 @@
 import random
-from util import Util
-from gameobjects import *
+from game_objects import *
 
 class Util_Level_5:
-    def __init__(self):
-        self.util = Util(self, "Level_5")
+    def __init__(self, util):
+        self.util = util
         
         self.random_positions = []
         for i in range(16):
@@ -35,14 +34,10 @@ class Util_Level_5:
         self.doors = [self.door]
 
         self.walls = []
-
-    def run(self, is_test=False):
-        self.util.run(is_test)
+        
+        self.level = Level_5(self)
 
 class Level_5:
-    def __init__(self, players = []):
-        self.__util_level_5 = Util_Level_5()
+    def __init__(self, level_util):
+        self.__util_level_5 = level_util
         self.players = self.__util_level_5.players
-
-    def run(self):
-        self.__util_level_5.run()

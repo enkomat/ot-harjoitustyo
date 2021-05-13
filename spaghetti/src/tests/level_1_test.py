@@ -7,7 +7,6 @@ class TestLevel_1(unittest.TestCase):
         util_lvl_1 = lvl1._Level_1__util_level_1
         player_start_x = util_lvl_1.player._Player__position_x
         player_start_y = util_lvl_1.player._Player__position_x
-        
         for i in range(4):
             lvl1.player.move_left()
             if i == 1:
