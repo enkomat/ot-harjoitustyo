@@ -1,3 +1,2 @@
-from util import *
-
+from util import Util
 util = Util()

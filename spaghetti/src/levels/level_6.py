@@ -12,6 +12,13 @@ class Util_Level_6:
 
         self.walls = []
 
+        self.pillars = []
+        self.randomize_pillars()
+
+        self.level = Level_6(self)
+
+    def randomize_pillars(self):
+        self.pillars.clear()
         random_x_left = random.randint(10, 15)
         random_x_right = random.randint(17, 25)
         random_y_top = random.randint(10, 15)
@@ -22,8 +29,6 @@ class Util_Level_6:
         self.p2 = Pillar(random_x_left, random_y_top)
         self.p3 = Pillar(random_x_right, random_y_top)
         self.pillars = [self.p0, self.p1, self.p2, self.p3]
-
-        self.level = Level_6(self)
 
 class Level_6:
     def __init__(self, level_util):

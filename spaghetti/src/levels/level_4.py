@@ -26,6 +26,8 @@ class Util_Level_4:
         self.door = Door(15, 15)
         self.doors = [self.door]
 
+        self.pillars = []
+
         self.walls = []
 
         self.level = Level_4(self)
