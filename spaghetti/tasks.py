@@ -2,38 +2,7 @@ from invoke import task
 
 @task
 def start(ctx):
-    ctx.run("python3 src/level_1.py")
-
-# Underscores do not work in Pyinvoke task names
-# You can make them work by changing the config as shown:
-# http://docs.pyinvoke.org/en/latest/concepts/namespaces.html#dashes-vs-underscores
-@task
-def level1(ctx):
-    ctx.run("python3 src/level_1.py")
-
-@task
-def level2(ctx):
-    ctx.run("python3 src/level_2.py")
-
-@task
-def level3(ctx):
-    ctx.run("python3 src/level_3.py")
-
-@task
-def level4(ctx):
-    ctx.run("python3 src/level_4.py")
-
-@task
-def level5(ctx):
-    ctx.run("python3 src/level_5.py")
-
-@task
-def level6(ctx):
-    ctx.run("python3 src/level_6.py")
-
-@task
-def level7(ctx):
-    ctx.run("python3 src/level_7.py")
+    ctx.run("python3 src/start_game.py")
 
 @task
 def test(ctx):

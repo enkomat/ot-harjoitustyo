@@ -2,18 +2,18 @@ from levels.level_1 import Level_1
 
 class Level_1_Solution:
     def __init__(self, level: Level_1):
-        for i in range(4):
-            level.player.move_left()
-            level.player.build_wall()
-        for i in range(4):
-            level.player.move_up()
-            level.player.build_wall()
-        for i in range(6):
-            level.player.move_left()
-            level.player.build_wall()
-        for i in range(6):
-            level.player.move_up()
-            level.player.build_wall()
-        for i in range(10):
-            level.player.move_right()
-            level.player.build_wall()
+        self.level = level
+        self.player = self.level.player
+        self.move_in_direction(15, "right")
+        self.move_in_direction(14, "down")
+
+    def move_in_direction(self, amt, dir):
+        for i in range(amt):
+            if dir == "up":
+                self.player.move_up()
+            elif dir == "down":
+                self.player.move_down()
+            elif dir == "left":
+                self.player.move_left()
+            elif dir == "right":
+                self.player.move_right()

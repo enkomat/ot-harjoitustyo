@@ -1,5 +1,4 @@
 from game_objects import *
-import random
 
 class Util_Level_2:
     """Pelin ensimmäisen tason työkalupakettiluokka.
@@ -13,33 +12,40 @@ class Util_Level_2:
     def __init__(self, util):
         self.util = util
         
-        self.player = Player(self, 27, 27)
-        self.players = [self.player]
+        self.player1 = Player(self, 2, 21)
+        self.player2 = Player(self, 2, 18)
+        self.player3 = Player(self, 2, 15)
+        self.player4 = Player(self, 2, 12)
+        self.player5 = Player(self, 2, 9)
+        self.players = [self.player1, self.player2, self.player3, self.player4, self.player5]
         
-        self.doors = []
+        self.door1 = Door(29, 21)
+        self.door2 = Door(29, 18)
+        self.door3 = Door(29, 15)
+        self.door4 = Door(29, 12)
+        self.door5 = Door(29, 9)
+        self.doors = [self.door1, self.door2, self.door3, self.door4, self.door5]
 
         self.walls = []
 
-        random_x_left = random.randint(10, 15)
-        random_x_right = random.randint(17, 25)
-        random_y_top = random.randint(10, 15)
-        random_y_bottom = random.randint(17, 25)
-
-        self.p0 = Pillar(random_x_right, random_y_bottom)
-        self.p1 = Pillar(random_x_left, random_y_bottom)
-        self.p2 = Pillar(random_x_left, random_y_top)
-        self.p3 = Pillar(random_x_right, random_y_top)
-        self.pillars = [self.p0, self.p1, self.p2, self.p3]
+        self.pillars = []
 
         self.level = Level_2(self)
 
     def level_win_condition_satisfied(self):
-        return False
+        for player in self.players:
+            went_through_door = False
+            for door in self.doors:
+                if player._Player__position_x == door._Door__position_x and player._Player__position_y == door._Door__position_y and player._Player__has_interacted:
+                    went_through_door = True
+            if went_through_door == False:
+                return False
+        return True
 
 class Level_2:
     """Pelaajalle avoinna oleva luokka jonka kautta kutsutaan tason ratkaisemiseen tarkoitettuja metodeja.
     """
     def __init__(self, level_util):
         self.__util_level_2 = level_util
-        self.player = self.__util_level_2.player
-        self.pillars = self.__util_level_2.pillars
+        self.players = self.__util_level_2.players
+        self.doors = self.__util_level_2.doors

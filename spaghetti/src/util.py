@@ -103,6 +103,112 @@ class Game_Sounds:
                 new_sound = pygame.mixer.Sound(path)
                 self.__sounds.append(new_sound)
 
+class Event_Handler:
+    def __init__(self, util):
+        self.util = util
+        self.event_list = []
+        self.event_parameter_list = []
+        self.event_execution_amount = 0
+        self.time_since_last_event_execute = 0.0
+        self.event_index = 0
+        self.event_execution_speed = 120
+
+    def execute_next_method_in_event_list(self):
+        """Suorittaa seuraavan metodin pelin aikana suoritettavien metodien listasta.
+        """
+        if self.event_index < len(self.event_list) and self.time_since_last_event_execute > self.event_execution_speed:
+            event_type = self.event_list[self.event_index]
+            player_reference = self.event_parameter_list[self.event_index]
+            if event_type is Game_Event.MOVE_PLAYER_RIGHT:
+                self.util.move_player_right(player_reference)
+            elif event_type is Game_Event.MOVE_PLAYER_LEFT:
+                self.util.move_player_left(player_reference)
+            elif event_type is Game_Event.MOVE_PLAYER_UP:
+                self.util.move_player_up(player_reference)
+            elif event_type is Game_Event.MOVE_PLAYER_DOWN:
+                self.util.move_player_down(player_reference)
+            elif event_type is Game_Event.PLAYER_INTERACT:
+                self.util.player_interact(player_reference)
+            elif event_type is Game_Event.PLAYER_BUILD_WALL:
+                self.util.player_build_wall(player_reference)
+            elif event_type is Game_Event.PLAYER_BUILD_DOOR:
+                self.util.player_build_door(player_reference)
+            
+            self.event_execution_amount += 1
+            self.time_since_last_event_execute = 0.0
+            self.event_index += 1
+
+    def all_events_have_been_executed(self):
+        return self.event_index == len(self.event_list)
+
+    def reload_events(self, current_level):
+        self.event_index = 0
+        self.event_execution_amount = 0
+        self.time_since_last_event_execute = 0.0
+        
+        if current_level == 1:
+            self.reload_level_1_events()
+        elif current_level == 2:
+            self.reload_level_2_events()
+
+    def reload_level_1_events(self):
+        self.event_list.clear()
+        self.event_parameter_list.clear()
+        import level_1_solution
+        importlib.reload(level_1_solution)
+        from level_1_solution import Level_1_Solution
+        self.util.solution = Level_1_Solution(self.util.level_util.level)
+
+    def reload_level_2_events(self):
+        self.event_list.clear()
+        self.event_parameter_list.clear()
+        import level_2_solution
+        importlib.reload(level_2_solution)
+        from level_2_solution import Level_2_Solution
+        self.util.solution = Level_2_Solution(self.util.level_util.level)
+
+    def reload_level_3_events(self):
+        self.event_list.clear()
+        self.event_parameter_list.clear()
+        import level_3_solution
+        importlib.reload(level_3_solution)
+        from level_3_solution import Level_3_Solution
+        self.util.solution = Level_3_Solution(self.util.level_util.level)
+
+    def reload_level_4_events(self):
+        self.event_list.clear()
+        self.event_parameter_list.clear()
+        import level_4_solution
+        importlib.reload(level_4_solution)
+        from level_4_solution import Level_4_Solution
+        self.util.solution = Level_4_Solution(self.util.level_util.level)
+
+    def reload_level_5_events(self):
+        self.event_list.clear()
+        self.event_parameter_list.clear()
+        import level_5_solution
+        importlib.reload(level_5_solution)
+        from level_5_solution import Level_5_Solution
+        self.util.solution = Level_5_Solution(self.util.level_util.level)
+
+    def reload_level_6_events(self):
+        self.event_list.clear()
+        self.event_parameter_list.clear()
+        import level_6_solution
+        importlib.reload(level_6_solution)
+        from level_6_solution import Level_6_Solution
+        self.util.solution = Level_6_Solution(self.util.level_util.level)
+
+    def add_new_event(self, method_name, method_parameter):
+        """Lisää tietyn metodikutsun suoritettavien metodien listaan, eli event_list listaan.
+
+        Args:
+            method_to_add (metodikutsu): Mikä tahansa metodi joka halutaan lisätä suoritettavien metodien listaan.
+            parameter (metodikutsun parametrin): Aiemman metodin parametri jota tarvitaan.
+        """
+        self.event_list.append(method_name)
+        self.event_parameter_list.append(method_parameter)
+
 class Game_State(Enum):
     MAIN_MENU = 1
     PLAYING = 2
@@ -148,25 +254,23 @@ class Util:
         self.sounds = Game_Sounds()
         self.sound_on = True
 
-        self.event_list = []
-        self.event_parameter_list = []
-        self.event_execution_amount = 0
-        self.time_since_last_event_list_execute = 0.0
-        self.event_index = 0
+        self.event_handler = Event_Handler(self)
 
         self.fps = 60
         self.clock = pygame.time.Clock()
         self.game_speed = 40
+        self.mouse_position = pygame.mouse.get_pos()
 
         self.levels = [Util_Level_1(self), Util_Level_2(self), Util_Level_3(self), Util_Level_4(self), Util_Level_5(self), Util_Level_6(self)]
 
         self.level_util = self.levels[0]
         self.level_name = level_name
+        self.level_index = 1
         self.level_background = self.tiles.level_backgrounds[0]
-        self.level_solved = False
         self.game_paused = True
         self.play_button = self.tiles.play_icon # swaps between pause and play
         self.game_state = Game_State.MAIN_MENU
+        self.is_test = False
 
         center_x = self.width / 2
         self.play_button_position = (center_x - 25, self.height - 60)
@@ -174,212 +278,114 @@ class Util:
         self.menu_button_position = (self.width - 60, self.height - 60)
 
         self.solution = Level_1_Solution(self.level_util.level)
+        self.run_game = True
         
         self.run()
 
     # -----------------------
     # main game loop:
-    def run(self, is_test = False):
-        run = True
-        while run:
+    def run(self):
+        while self.run_game:
+            self.mouse_position = pygame.mouse.get_pos()
+            
             if self.game_state == Game_State.MAIN_MENU:
-                self.draw_main_menu()
-                # if the quit button is pressed in events, the while loop should break
-                if self.handle_main_menu_events() == False:
-                    break
+                self.execute_main_menu()
             elif self.game_state == Game_State.PLAYING:
-                if self.should_run(is_test): # automatic window closing for tests
-                    # timekeeping variables
-                    self.clock.tick(self.fps)
-                    self.time_since_last_event_list_execute += self.clock.tick(self.fps)
-                     # if the quit button is pressed in events, the while loop should break
-                    if self.handle_playing_events():
-                        self.draw_current_level() # view is updated so buttons can be updated
-                    else:
-                        break
-                    # only update map if an event has been executed
-                    if self.execute_next_method_in_event_list():
-                        self.draw_current_level()
-                else:
-                    break
+                self.execute_game()
         # quit game after the game loop has been terminated
         pygame.quit()
 
     # -----------------------
-    # methods that are called from main game loop:
+    # methods that are called from main game loop
 
-    def should_run(self, is_test):
-        if is_test and len(self.event_list) == 0:
-            return False
-        return True
+    def execute_main_menu(self):
+        # if the quit button is pressed in events, the while loop should break
+        self.handle_main_menu_events()
+        self.draw_main_menu()
+
+    def execute_game(self):
+        self.event_handler.time_since_last_event_execute += self.clock.tick(self.fps)
+        self.handle_playing_events()
+        
+        if not self.game_paused:
+            self.event_handler.execute_next_method_in_event_list()
+        
+        if self.event_handler.all_events_have_been_executed():
+            self.pause_game()
+       
+        self.draw_current_level()
 
     def handle_playing_events(self):
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
-                return False
+                self.run_game = False
             elif event.type == pygame.MOUSEBUTTONUP:
-                mouse_position = pygame.mouse.get_pos()
-                # currently defined button positions are their upper left corner, so center is new variable
                 play_button_center = (381, 730)
                 reset_button_center = (435, 735)
                 menu_button_center = (736, 733)
-                if self.distance(mouse_position, play_button_center) < 20:
-                    self.game_paused = not self.game_paused
-                    if self.game_paused:
-                        self.play_button = self.tiles.play_icon
-                    else:
-                        self.play_button = self.tiles.pause_icon
-                elif self.distance(mouse_position, reset_button_center) < 20:
-                    self.reload_events()
-                    self.reset_game_state()
-                elif self.distance(mouse_position, menu_button_center) < 20:
-                    self.game_state = Game_State.MAIN_MENU
-                    self.game_paused = True
-                    self.play_button = self.tiles.play_icon
-        return True
+                if self.distance(self.mouse_position, play_button_center) < 20:
+                    self.play_button_pressed()
+                elif self.distance(self.mouse_position, reset_button_center) < 20:
+                    self.reset_button_pressed()
+                elif self.distance(self.mouse_position, menu_button_center) < 20:
+                    self.menu_button_pressed()
     
+    def play_button_pressed(self):
+        self.game_paused = not self.game_paused
+        if self.game_paused:
+            self.play_button = self.tiles.play_icon
+        else:
+            self.play_button = self.tiles.pause_icon
+
+    def reset_button_pressed(self):
+        self.event_handler.reload_events(self.level_index)
+        self.reset_game_state()
+
+    def menu_button_pressed(self):
+        self.game_state = Game_State.MAIN_MENU
+        self.game_paused = True
+        self.play_button = self.tiles.play_icon
+
     def handle_main_menu_events(self):
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
-                return False
+                self.run_game = False
             elif event.type == pygame.MOUSEBUTTONUP:
-                mouse_position = pygame.mouse.get_pos()
                 # currently defined button positions are their upper left corner, so center is new variable
                 level_1_button_center = (45, 35)
                 level_2_button_center = (45, 60)
-                level_3_button_center = (450, 60)
-                level_4_button_center = (450, 60)
-                level_5_button_center = (450, 60)
-                level_6_button_center = (450, 60)
-                print(mouse_position)
-                if self.distance(mouse_position, level_1_button_center) < 20:
-                    self.game_state = Game_State.PLAYING
-                    self.level_util = self.levels[0]
-                    self.level_background = self.tiles.level_backgrounds[0]
-                    self.solution = Level_1_Solution(self.level_util.level)
-                    self.reload_events()
-                    self.draw_current_level()
-                elif self.distance(mouse_position, level_2_button_center) < 20:
-                    self.game_state = Game_State.PLAYING
-                    self.level_util = self.levels[1]
-                    self.level_background = self.tiles.level_backgrounds[1]
-                    self.solution = Level_2_Solution(self.level_util.level)
-                    self.reload_events()
-                    self.draw_current_level()
-                elif self.distance(mouse_position, level_3_button_center) < 20:
-                    self.game_state = Game_State.PLAYING
-                    self.level_util = self.levels[2]
-                    self.level_background = self.tiles.level_backgrounds[2]
-                    self.solution = Level_3_Solution(self.level_util.level)
-                    self.reload_events()
-                    self.draw_current_level()
-                elif self.distance(mouse_position, level_4_button_center) < 20:
-                    self.game_state = Game_State.PLAYING
-                    self.level_util = self.levels[3]
-                    self.level_background = self.tiles.level_backgrounds[3]
-                    self.solution = Level_4_Solution(self.level_util.level)
-                    self.reload_events()
-                    self.draw_current_level()
-                elif self.distance(mouse_position, level_5_button_center) < 20:
-                    self.game_state = Game_State.PLAYING
-                    self.level_util = self.levels[4]
-                    self.level_background = self.tiles.level_backgrounds[4]
-                    self.solution = Level_5_Solution(self.level_util.level)
-                    self.reload_events()
-                    self.draw_current_level()
-                elif self.distance(mouse_position, level_6_button_center) < 20:
-                    self.game_state = Game_State.PLAYING
-                    self.level_util = self.levels[5]
-                    self.level_background = self.tiles.level_backgrounds[5]
-                    self.solution = Level_6_Solution(self.level_util.level)
-                    self.reload_events()
-                    self.draw_current_level()
-        return True
+                level_3_button_center = (45, 85)
+                level_4_button_center = (45, 110)
+                level_5_button_center = (45, 135)
+                level_6_button_center = (45, 160)
 
-    def reload_events(self):
-        if self.level_util == self.levels[0]:
-            self.reload_level_1_events()
-        elif self.level_util == self.levels[1]:
-            self.reload_level_2_events()
+                if self.distance(self.mouse_position, level_1_button_center) < 20:
+                    self.go_to_level(self.levels[0], self.tiles.level_backgrounds[1], Level_1_Solution, 1)
+                elif self.distance(self.mouse_position, level_2_button_center) < 20:
+                    self.go_to_level(self.levels[1], self.tiles.level_backgrounds[1])
+                elif self.distance(self.mouse_position, level_3_button_center) < 20:
+                    self.go_to_level(self.levels[2], self.tiles.level_backgrounds[1])
+                elif self.distance(self.mouse_position, level_4_button_center) < 20:
+                    self.go_to_level(self.levels[3], self.tiles.level_backgrounds[1])
+                elif self.distance(self.mouse_position, level_5_button_center) < 20:
+                    self.go_to_level(self.levels[4], self.tiles.level_backgrounds[0])
+                elif self.distance(self.mouse_position, level_6_button_center) < 20:
+                    self.go_to_level(self.levels[5], self.tiles.level_backgrounds[1])
 
-    def reload_level_1_events(self):
-        self.event_list.clear()
-        import level_1_solution
-        importlib.reload(level_1_solution)
-        from level_1_solution import Level_1_Solution
-        self.solution = Level_1_Solution(self.level_util.level)
+    def pause_game(self):
+        self.play_button = self.tiles.play_icon
+        self.game_paused = True
 
-    def reload_level_2_events(self):
-        self.event_list.clear()
-        import level_2_solution
-        importlib.reload(level_2_solution)
-        from level_2_solution import Level_2_Solution
-        self.solution = Level_2_Solution(self.level_util.level)
-
-    def reload_level_3_events(self):
-        self.event_list.clear()
-        import level_3_solution
-        importlib.reload(level_3_solution)
-        from level_3_solution import Level_3_Solution
-        self.solution = Level_3_Solution(self.level_util.level)
-
-    def reload_level_4_events(self):
-        self.event_list.clear()
-        import level_4_solution
-        importlib.reload(level_4_solution)
-        from level_4_solution import Level_2_Solution
-        self.solution = Level_4_Solution(self.level_util.level)
-
-    def reload_level_5_events(self):
-        self.event_list.clear()
-        import level_5_solution
-        importlib.reload(level_5_solution)
-        from level_5_solution import Level_5_Solution
-        self.solution = Level_5_Solution(self.level_util.level)
-
-    def reload_level_6_events(self):
-        self.event_list.clear()
-        import level_6_solution
-        importlib.reload(level_6_solution)
-        from level_6_solution import Level_6_Solution
-        self.solution = Level_6_Solution(self.level_util.level)
-
-    def execute_next_method_in_event_list(self):
-        """Suorittaa seuraavan metodin pelin aikana suoritettavien metodien listasta.
-        """
-        if self.game_paused:
-            return
-
-        if self.event_index < len(self.event_list) and self.time_since_last_event_list_execute > self.game_speed:
-            event_type = self.event_list[self.event_index]
-            player_reference = self.event_parameter_list[self.event_index]
-            if event_type is Game_Event.MOVE_PLAYER_RIGHT:
-                self.move_player_right(player_reference)
-            elif event_type is Game_Event.MOVE_PLAYER_LEFT:
-                self.move_player_left(player_reference)
-            elif event_type is Game_Event.MOVE_PLAYER_UP:
-                self.move_player_up(player_reference)
-            elif event_type is Game_Event.MOVE_PLAYER_DOWN:
-                self.move_player_down(player_reference)
-            elif event_type is Game_Event.PLAYER_INTERACT:
-                self.player_interact(player_reference)
-            elif event_type is Game_Event.PLAYER_BUILD_WALL:
-                self.player_build_wall(player_reference)
-            elif event_type is Game_Event.PLAYER_BUILD_DOOR:
-                self.player_build_door(player_reference)
-            
-            self.event_execution_amount += 1
-            self.time_since_last_event_list_execute = 0
-            self.event_index += 1
-            return True
-        # when all the events have executed, the game is paused
-        if self.event_index == len(self.event_list):
-            self.play_button = self.tiles.play_icon
-            self.game_paused = True
-            self.draw_current_level()
-        return False
+    def go_to_level(self, level_util, background, solution, level_index):
+        self.game_state = Game_State.PLAYING
+        self.level_util = level_util
+        self.level_background = background
+        self.solution = solution(self.level_util.level)
+        self.level_index = level_index
+        self.reset_game_state()
+        self.draw_current_level()
 
     def draw_current_level(self):
         self.draw_map()
@@ -424,13 +430,6 @@ class Util:
         """
         text_surface = self.font.render(text, False, color)
         self.window.blit(text_surface, (x, y))
-
-    def draw_text_level_solved(self):
-        """Piirtää tekstin kun tietty taso on selvitetty.
-        """
-        text_surface = self.font_level_solved.render(
-            'LEVEL SOLVED! :)', False, (255, 255, 255))
-        self.window.blit(text_surface, (128, 256))
 
     def draw_text_level_failed(self):
         """Piirtää tekstin kun jokin taso on hävitty.
@@ -638,9 +637,9 @@ class Util:
 
     def level_has_been_solved(self):
         if self.level_util.level_win_condition_satisfied():
-            if self.level_solved == False:
+            if self.level_util.level_solved == False:
                 self.play_sound(self.sounds.level_win)
-                self.level_solved = True
+                self.level_util.level_solved = True
             return True
         return False        
 
@@ -708,23 +707,11 @@ class Util:
         if self.sound_on: 
             pygame.mixer.Sound.play(sound)
 
-    # event list addition:
-
-    def add_to_event_list(self, method_name, method_parameter):
-        """Lisää tietyn metodikutsun suoritettavien metodien listaan, eli event_list listaan.
-
-        Args:
-            method_to_add (metodikutsu): Mikä tahansa metodi joka halutaan lisätä suoritettavien metodien listaan.
-            parameter (metodikutsun parametrin): Aiemman metodin parametri jota tarvitaan.
-        """
-        self.event_list.append(method_name)
-        self.event_parameter_list.append(method_parameter)
-
     def get_game_state(self): 
         self.sound_on = False
-        for i in range(len(self.event_list)):
-            event_type = self.event_list[i]
-            player_reference = self.event_parameter_list[i]
+        for i in range(len(self.event_handler.event_list)):
+            event_type = self.event_handler.event_list[i]
+            player_reference = self.event_handler.event_parameter_list[i]
             
             if event_type is Game_Event.MOVE_PLAYER_RIGHT:
                 self.move_player_right(player_reference)
@@ -743,13 +730,20 @@ class Util:
         self.sound_on = True
 
     def reset_game_state(self):
+        self.event_handler.reload_events(self.level_index)
         self.game_paused = True
         self.play_button = self.tiles.play_icon
         self.level_util.walls.clear()
         for player in self.level_util.players:
             player._Player__position_x = player._Player__original_x
             player._Player__position_y = player._Player__original_y
+            player._Player__has_interacted = False
+            player._Player__draw_player = True
+        for door in self.level_util.doors:
+            door._Door__is_open = False
         self.event_index = 0
+        self.event_execution_amount = 0
+        self.level_util.level_solved = False
 
     def distance(self, p1, p2):
         return math.sqrt(((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2))

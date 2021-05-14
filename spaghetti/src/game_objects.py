@@ -15,25 +15,25 @@ class Player:
         self.__draw_player = True
 
     def move_left(self):
-        self.__util.add_to_event_list(Game_Event.MOVE_PLAYER_LEFT, self)
+        self.__util.event_handler.add_new_event(Game_Event.MOVE_PLAYER_LEFT, self)
 
     def move_right(self):
-        self.__util.add_to_event_list(Game_Event.MOVE_PLAYER_RIGHT, self)
+        self.__util.event_handler.add_new_event(Game_Event.MOVE_PLAYER_RIGHT, self)
 
     def move_up(self):
-        self.__util.add_to_event_list(Game_Event.MOVE_PLAYER_UP, self)
+        self.__util.event_handler.add_new_event(Game_Event.MOVE_PLAYER_UP, self)
 
     def move_down(self):
-        self.__util.add_to_event_list(Game_Event.MOVE_PLAYER_DOWN, self)
+        self.__util.event_handler.add_new_event(Game_Event.MOVE_PLAYER_DOWN, self)
 
     def interact(self):
-        self.__util.add_to_event_list(Game_Event.PLAYER_INTERACT, self)
+        self.__util.event_handler.add_new_event(Game_Event.PLAYER_INTERACT, self)
 
     def build_wall(self):
-        self.__util.add_to_event_list(Game_Event.PLAYER_BUILD_WALL, self)
+        self.__util.event_handler.add_new_event(Game_Event.PLAYER_BUILD_WALL, self)
     
     def build_door(self):
-        self.__util.add_to_event_list(Game_Event.PLAYER_BUILD_DOOR, self)
+        self.__util.event_handler.add_new_event(Game_Event.PLAYER_BUILD_DOOR, self)
 
     def get_position_x(self):
         self.__util.get_game_state()

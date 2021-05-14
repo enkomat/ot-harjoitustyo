@@ -1,43 +1,250 @@
 import random
 from game_objects import *
 
+level_solution = """
+20
+22
+Wall_Type.HORIZONTAL
+---------
+19
+22
+Wall_Type.DOOR
+---------
+18
+22
+Wall_Type.HORIZONTAL
+---------
+17
+22
+Wall_Type.CORNER_LOWER_LEFT
+---------
+17
+21
+Wall_Type.VERTICAL_LEFT
+---------
+17
+20
+Wall_Type.VERTICAL_LEFT
+---------
+17
+19
+Wall_Type.VERTICAL_LEFT
+---------
+17
+18
+Wall_Type.CORNER_UPPER_LEFT
+---------
+16
+18
+Wall_Type.HORIZONTAL
+---------
+15
+18
+Wall_Type.HORIZONTAL
+---------
+14
+18
+Wall_Type.HORIZONTAL
+---------
+13
+18
+Wall_Type.HORIZONTAL
+---------
+12
+18
+Wall_Type.HORIZONTAL
+---------
+11
+18
+Wall_Type.CORNER_LOWER_LEFT
+---------
+11
+17
+Wall_Type.VERTICAL_LEFT
+---------
+11
+16
+Wall_Type.VERTICAL_LEFT
+---------
+11
+15
+Wall_Type.VERTICAL_LEFT
+---------
+11
+14
+Wall_Type.VERTICAL_LEFT
+---------
+11
+13
+Wall_Type.VERTICAL_LEFT
+---------
+11
+12
+Wall_Type.CORNER_UPPER_LEFT
+---------
+12
+12
+Wall_Type.HORIZONTAL
+---------
+13
+12
+Wall_Type.HORIZONTAL
+---------
+14
+12
+Wall_Type.HORIZONTAL
+---------
+15
+12
+Wall_Type.HORIZONTAL
+---------
+16
+12
+Wall_Type.HORIZONTAL
+---------
+17
+12
+Wall_Type.HORIZONTAL
+---------
+18
+12
+Wall_Type.HORIZONTAL
+---------
+19
+12
+Wall_Type.HORIZONTAL
+---------
+20
+12
+Wall_Type.HORIZONTAL
+---------
+21
+12
+Wall_Type.CORNER_UPPER_RIGHT
+---------
+21
+13
+Wall_Type.VERTICAL_RIGHT
+---------
+21
+14
+Wall_Type.VERTICAL_RIGHT
+---------
+21
+15
+Wall_Type.VERTICAL_RIGHT
+---------
+21
+16
+Wall_Type.VERTICAL_RIGHT
+---------
+21
+17
+Wall_Type.VERTICAL_RIGHT
+---------
+21
+18
+Wall_Type.CORNER_UPPER_RIGHT
+---------
+21
+19
+Wall_Type.VERTICAL_RIGHT
+---------
+21
+20
+Wall_Type.VERTICAL_RIGHT
+---------
+21
+21
+Wall_Type.VERTICAL_RIGHT
+---------
+21
+22
+Wall_Type.CORNER_LOWER_RIGHT
+---------
+20
+18
+Wall_Type.HORIZONTAL
+---------
+19
+18
+Wall_Type.DOOR
+---------
+18
+18
+Wall_Type.HORIZONTAL
+---------
+"""
+
 class Util_Level_5:
     def __init__(self, util):
         self.util = util
+
+        self.player = Player(self, 21, 22)
+        self.players = [self.player]
         
-        self.random_positions = []
-        for i in range(16):
-            x = random.choice([i for i in range(1,30) if i not in [15]])
-            y = random.choice([i for i in range(1,30) if i not in [15]])
-            self.random_positions.append((x, y))
-
-        self.__p1 = Player(self, self.random_positions[0][0], self.random_positions[0][1])
-        self.__p2 = Player(self, self.random_positions[1][0], self.random_positions[1][1])
-        self.__p3 = Player(self, self.random_positions[2][0], self.random_positions[2][1])
-        self.__p4 = Player(self, self.random_positions[3][0], self.random_positions[3][1])
-        self.__p5 = Player(self, self.random_positions[4][0], self.random_positions[4][1])
-        self.__p6 = Player(self, self.random_positions[5][0], self.random_positions[5][1])
-        self.__p7 = Player(self, self.random_positions[6][0], self.random_positions[6][1])
-        self.__p8 = Player(self, self.random_positions[7][0], self.random_positions[7][1])
-        self.__p9 = Player(self, self.random_positions[8][0], self.random_positions[8][1])
-        self.__p10 = Player(self, self.random_positions[9][0], self.random_positions[9][1])
-        self.__p11 = Player(self, self.random_positions[10][0], self.random_positions[10][1])
-        self.__p12 = Player(self, self.random_positions[11][0], self.random_positions[11][1])
-        self.__p13 = Player(self, self.random_positions[12][0], self.random_positions[11][1])
-        self.__p14 = Player(self, self.random_positions[13][0], self.random_positions[12][1])
-        self.__p15 = Player(self, self.random_positions[14][0], self.random_positions[13][1])
-        self.__p16 = Player(self, self.random_positions[15][0], self.random_positions[14][1])
-        self.players = [self.__p1, self.__p2, self.__p3, self.__p4, self.__p5, self.__p6, self.__p7, self.__p8,
-               self.__p9, self.__p10, self.__p11, self.__p12, self.__p13, self.__p14, self.__p15, self.__p16]
-
-        self.door = Door(15, 15)
-        self.doors = [self.door]
+        self.doors = []
 
         self.walls = []
-        
+
+        self.p0 = Pillar(21, 22)
+        self.p1 = Pillar(17, 22)
+        self.p2 = Pillar(17, 18)
+        self.p3 = Pillar(11, 18)
+        self.p4 = Pillar(11, 12)
+        self.p5 = Pillar(21, 12)
+        self.p6 = Pillar(21, 18)
+        self.pillars = [self.p0, self.p1, self.p2, self.p3, self.p4, self.p5, self.p6] 
+
         self.level = Level_5(self)
+
+    def level_win_condition_satisfied(self):
+        level_solution_list = level_solution.splitlines()
+        index = 0
+        x = 0
+        y = 0
+        wall_type = None
+        solution_coordinates = []
+        # check all needed walls exist
+        for line in level_solution_list:
+
+            if index == 1:
+                x = int(line)
+            elif index == 2:
+                y = int(line)
+            elif index == 3:
+                pass
+
+            index += 1
+            
+            if index == 4:
+                solution_coordinates.append((x, y))
+                index = 0
+
+        for coord in solution_coordinates:
+            wall_found_in_position = False
+            for wall in self.walls:
+                if coord[0] == wall.get_position_x() and coord[1] == wall.get_position_y():
+                    wall_found_in_position = True
+            if wall_found_in_position == False:
+                    return False
+
+        # check if a wall exists in wrong place
+        for wall in self.walls:
+            wall_in_wrong_place = True
+            current_x = wall.get_position_x()
+            current_y = wall.get_position_y()
+            for coordinate in solution_coordinates:
+                if coordinate[0] == current_x and coordinate[1] == current_y:
+                    wall_in_wrong_place = False
+                    break
+            if wall_in_wrong_place:
+                return False
+    
+        return True
 
 class Level_5:
     def __init__(self, level_util):
         self.__util_level_5 = level_util
-        self.players = self.__util_level_5.players
+        self.player = self.__util_level_5.player
+        self.pillars = self.__util_level_5.pillars
