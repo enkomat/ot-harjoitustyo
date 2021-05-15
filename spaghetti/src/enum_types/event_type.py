@@ -1,6 +1,6 @@
 from enum import Enum
 
-class Game_Event(Enum):
+class Event_Type(Enum):
     MOVE_PLAYER_LEFT = 1
     MOVE_PLAYER_RIGHT = 2
     MOVE_PLAYER_UP = 3

@@ -1,5 +1,6 @@
 import pygame
-from wall_type import Wall_Type
+
+from enum_types.wall_type import Wall_Type
 
 class Game_Logic:
     def __init__(self, util):

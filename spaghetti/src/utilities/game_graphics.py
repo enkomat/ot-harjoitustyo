@@ -1,6 +1,7 @@
 import pygame
-from image_tiles import Image_Tiles
-from wall_type import Wall_Type
+
+from utilities.image_tiles import Image_Tiles
+from enum_types.wall_type import Wall_Type
 
 class Game_Graphics:
     def __init__(self, util):

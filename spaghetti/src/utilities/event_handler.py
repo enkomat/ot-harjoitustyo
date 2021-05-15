@@ -1,12 +1,6 @@
 import importlib
-from game_event import Game_Event
 
-from level_solutions.level_1_solution import Level_1_Solution
-from level_solutions.level_2_solution import Level_2_Solution
-from level_solutions.level_3_solution import Level_3_Solution
-from level_solutions.level_4_solution import Level_4_Solution
-from level_solutions.level_5_solution import Level_5_Solution
-from level_solutions.level_6_solution import Level_6_Solution
+from enum_types.event_type import Event_Type
 
 class Event_Handler:
     def __init__(self, util):
@@ -25,19 +19,19 @@ class Event_Handler:
         if self.event_index < len(self.event_list) and self.time_since_last_event_execute > self.event_execution_speed:
             event_type = self.event_list[self.event_index]
             player_reference = self.event_parameter_list[self.event_index]
-            if event_type is Game_Event.MOVE_PLAYER_RIGHT:
+            if event_type is Event_Type.MOVE_PLAYER_RIGHT:
                 self.logic.move_player_right(player_reference)
-            elif event_type is Game_Event.MOVE_PLAYER_LEFT:
+            elif event_type is Event_Type.MOVE_PLAYER_LEFT:
                 self.logic.move_player_left(player_reference)
-            elif event_type is Game_Event.MOVE_PLAYER_UP:
+            elif event_type is Event_Type.MOVE_PLAYER_UP:
                 self.logic.move_player_up(player_reference)
-            elif event_type is Game_Event.MOVE_PLAYER_DOWN:
+            elif event_type is Event_Type.MOVE_PLAYER_DOWN:
                 self.logic.move_player_down(player_reference)
-            elif event_type is Game_Event.PLAYER_INTERACT:
+            elif event_type is Event_Type.PLAYER_INTERACT:
                 self.logic.player_interact(player_reference)
-            elif event_type is Game_Event.PLAYER_BUILD_WALL:
+            elif event_type is Event_Type.PLAYER_BUILD_WALL:
                 self.logic.player_build_wall(player_reference)
-            elif event_type is Game_Event.PLAYER_BUILD_DOOR:
+            elif event_type is Event_Type.PLAYER_BUILD_DOOR:
                 self.logic.player_build_door(player_reference)
             
             self.event_execution_amount += 1
@@ -142,3 +136,23 @@ class Event_Handler:
         """
         self.event_list.append(method_name)
         self.event_parameter_list.append(method_parameter)
+
+    def execute_all_events(self):
+        for i in range(len(self.event_list)):
+            event_type = self.event_list[i]
+            player_reference = self.event_parameter_list[i]
+            
+            if event_type is Event_Type.MOVE_PLAYER_RIGHT:
+                self.logic.move_player_right(player_reference)
+            elif event_type is Event_Type.MOVE_PLAYER_LEFT:
+                self.logic.move_player_left(player_reference)
+            elif event_type is Event_Type.MOVE_PLAYER_UP:
+                self.logic.move_player_up(player_reference)
+            elif event_type is Event_Type.MOVE_PLAYER_DOWN:
+                self.logic.move_player_down(player_reference)
+            elif event_type is Event_Type.PLAYER_INTERACT:
+                self.logic.player_interact(player_reference)
+            elif event_type is Event_Type.PLAYER_BUILD_WALL:
+                self.logic.player_build_wall(player_reference)
+            elif event_type is Event_Type.PLAYER_BUILD_DOOR:
+                self.logic.layer_build_door(player_reference)

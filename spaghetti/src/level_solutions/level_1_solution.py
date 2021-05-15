@@ -5,3 +5,6 @@ class Level_1_Solution:
         level.player.move_right()
         level.player.move_right()
         level.player.move_right()
+        level.player.move_right()
+        level.player.move_right()
+        level.player.move_right()
