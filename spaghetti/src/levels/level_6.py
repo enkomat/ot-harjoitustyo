@@ -1,5 +1,6 @@
 import random
-from game_objects import *
+from game_objects.player import Player
+from game_objects.pillar import Pillar
 
 class Util_Level_6:
     def __init__(self, util):

@@ -1,5 +1,6 @@
 import random
-from game_objects import *
+from game_objects.player import Player
+from game_objects.pillar import Pillar
 
 level_solution = """
 20

@@ -1,4 +1,5 @@
-from game_objects import *
+from game_objects.player import Player
+from game_objects.door import Door
 
 class Util_Level_3:
     def __init__(self, util):

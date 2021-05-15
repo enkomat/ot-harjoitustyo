@@ -1,11 +1,8 @@
 import pygame
-import os
 import math
 from enum import Enum
 
 from game_event import Game_Event
-from wall_type import Wall_Type
-from game_objects import *
 from game_graphics import Game_Graphics
 from event_handler import Event_Handler
 from game_sounds import Game_Sounds
@@ -119,6 +116,8 @@ class Util:
         if self.game_paused:
             self.gui.play_button = self.gui.tiles.play_icon
         else:
+            if self.event_handler.event_index == 0:
+                self.event_handler.reload_events(self.level_index)
             self.gui.play_button = self.gui.tiles.pause_icon
 
     def reset_button_pressed(self):

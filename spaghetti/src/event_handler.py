@@ -48,7 +48,8 @@ class Event_Handler:
         return self.event_index == len(self.event_list)
 
     def reload_events(self, level_index):
-        self.event_index = 0
+        if self.event_index != 0:
+            self.event_index = 0
         self.event_execution_amount = 0
         self.time_since_last_event_execute = 0.0
         

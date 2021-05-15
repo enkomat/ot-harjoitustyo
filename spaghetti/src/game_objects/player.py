@@ -1,5 +1,4 @@
 from game_event import Game_Event
-from wall_type import Wall_Type
 
 class Player:
     """Myöhemmissä tasoissa käytetty luokka, joka mahdollistaa sen, että tasoa ratkottaesta voi ohjata useampaa pelaajaa.
@@ -46,40 +45,3 @@ class Player:
         updated_position_y = self.__position_y
         self.__util.reset_game_state()
         return updated_position_y
-
-class Door:
-    """Luo oven jonka paikan pelaaja voi hakea.
-    """
-    def __init__(self, position_x, position_y):
-        self.__position_x = position_x
-        self.__position_y = position_y
-        self.__is_open = False
-    
-    def get_position_x(self):
-        return self.__position_x
-    
-    def get_position_y(self):
-        return self.__position_y
-
-class Wall:
-    def __init__(self, position_x, position_y, wall_type = Wall_Type.HORIZONTAL):
-        self.__position_x = position_x
-        self.__position_y = position_y
-        self.type = wall_type
-    
-    def get_position_x(self):
-        return self.__position_x
-    
-    def get_position_y(self):
-        return self.__position_y
-
-class Pillar:
-    def __init__(self, position_x, position_y):
-        self.__position_x = position_x
-        self.__position_y = position_y
-    
-    def get_position_x(self):
-        return self.__position_x
-    
-    def get_position_y(self):
-        return self.__position_y
