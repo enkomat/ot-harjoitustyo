@@ -27,6 +27,8 @@ Tässä sovelluksen luokkien suhteita kuvaileva luokkakaavio:
 
 ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/luokkakaavio.png)
 
-### Ensimmäisen tason ratkaiseminen
+Kaikki yhteydet *enum_types* paketin sisällä oleviin luokkiin ovat katkoviivalla, koska sen sisällä olevat luokat ovat staattisia eikä niistä missään vaiheessa tehdä olioita.
+
+## Ensimmäisen tason ratkaiseminen
 
 ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level1seq.png)
