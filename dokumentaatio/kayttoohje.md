@@ -34,6 +34,3 @@ Tarkoituksena on koodaamalla Pythonia ratkaista taso. Kuvassa näkyvässä ensim
 Voit aloittaa poistamalla pass komennon ja lähteä liikuttamaan pelaajaa 'level' olion sisältämän 'player' olion metodien avulla.
 
 Kun koodi mielestäsi vaikuttaa toimivalta, voit painaa play nappia peli-ikkunasta. Ohjelmaa ei tarvitse käynnistää uudestaan. Kun muutat koodiasi, tallennettuasi sen voit painaa reset nappia (joka on play napin oikealla puolella) ja tällöin uusi koodisi automaattisesti peliin. Jos haluat palata takaisin tasovalikkoon, voit painaa valikkonappia joka löytyy ikkunan oikeasta alalaidasta.
-
-
-
