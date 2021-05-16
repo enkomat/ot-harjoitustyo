@@ -6,8 +6,6 @@ class UtilLevel1:
 
     Attributes:
         util = Util olio
-        player_position_x = pelaajan paikka kartalla x suunnassa
-        player_position_y = pelaajan paikka kartalla y suunnassa
         door = tason ovi ja sen paikka parametreina konstruktorille
     """
     def __init__(self, util):
@@ -16,13 +14,13 @@ class UtilLevel1:
 
         self.player = Player(self, 1, 1)
         self.players = [self.player]
-        
+
         self.door = Door(29, 15)
         self.doors = [self.door]
 
         self.walls = []
 
-        self.pillars = [] 
+        self.pillars = []
 
         self.level = Level1(self)
 

@@ -33,7 +33,7 @@ class EventHandler:
                 self.logic.player_build_wall(player_reference)
             elif event_type is EventType.PLAYER_BUILD_DOOR:
                 self.logic.player_build_door(player_reference)
-            
+
             self.event_execution_amount += 1
             self.time_since_last_event_execute = 0.0
             self.event_index += 1
@@ -48,7 +48,7 @@ class EventHandler:
         self.time_since_last_event_execute = 0.0
         self.event_list.clear()
         self.event_parameter_list.clear()
-        
+
         if level_index == 0:
             self.reload_level_1_events()
         elif level_index == 1:
@@ -64,7 +64,7 @@ class EventHandler:
 
     def reload_level_1_events(self):
         try:
-            import level_solutions.level_1_solution 
+            import level_solutions.level_1_solution
             importlib.reload(level_solutions.level_1_solution)
             from level_solutions.level_1_solution  import Level1Solution
             self.util.solution = Level1Solution(self.util.level_util.level)
@@ -73,7 +73,7 @@ class EventHandler:
 
     def reload_level_2_events(self):
         try:
-            import level_solutions.level_2_solution 
+            import level_solutions.level_2_solution
             importlib.reload(level_solutions.level_2_solution)
             from level_solutions.level_2_solution import Level2Solution
             self.util.solution = Level2Solution(self.util.level_util.level)
@@ -131,7 +131,7 @@ class EventHandler:
         for i in range(len(self.event_list)):
             event_type = self.event_list[i]
             player_reference = self.event_parameter_list[i]
-            
+
             if event_type is EventType.MOVE_PLAYER_RIGHT:
                 self.logic.move_player_right(player_reference)
             elif event_type is EventType.MOVE_PLAYER_LEFT:

@@ -30,7 +30,7 @@ class Player:
 
     def build_wall(self):
         self.__util.event_handler.add_new_event(EventType.PLAYER_BUILD_WALL, self)
-    
+
     def build_door(self):
         self.__util.event_handler.add_new_event(EventType.PLAYER_BUILD_DOOR, self)
 

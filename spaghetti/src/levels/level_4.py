@@ -22,9 +22,9 @@ class UtilLevel4:
         self.p_14 = Player(self, 27, 5)
         self.p_15 = Player(self, 29, 5)
         self.p_16 = Player(self, 31, 5)
-        self.players = [self.p_1, self.p_2, self.p_3, self.p_4, self.p_5, self.p_6, self.p_7, self.p_8, 
+        self.players = [self.p_1, self.p_2, self.p_3, self.p_4, self.p_5, self.p_6, self.p_7, self.p_8,
         self.p_9, self.p_10, self.p_11, self.p_12, self.p_13, self.p_14, self.p_15, self.p_16]
-        
+
         self.door = Door(15, 15)
         self.doors = [self.door]
 

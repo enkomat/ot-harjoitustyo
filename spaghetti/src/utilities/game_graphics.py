@@ -22,7 +22,7 @@ class GameGraphics:
         self.tiles = ImageTiles()
         self.level_background = self.tiles.level_backgrounds[0]
         self.play_button = self.tiles.play_icon # swaps between pause and play
-        
+
         center_x = self.width / 2
         self.play_button_position = (center_x - 25, self.height - 60)
         self.reset_button_position = (center_x + 25, self.height - 60)
@@ -142,7 +142,7 @@ class GameGraphics:
                 self.draw_tile(self.tiles.open_door, door._Door__position_x, door._Door__position_y)
             else:
                 self.draw_tile(self.tiles.closed_door, door._Door__position_x, door._Door__position_y)
-    
+
     def draw_players(self):
         for player in self.util.level_util.players:
             if player._Player__draw_player:
@@ -151,7 +151,7 @@ class GameGraphics:
     def draw_walls(self):
         for wall in self.util.level_util.walls:
             tile_to_draw = None
-            
+
             if wall.type == WallType.HORIZONTAL:
                 tile_to_draw = self.tiles.wall_horizontal
             elif wall.type == WallType.DOOR:

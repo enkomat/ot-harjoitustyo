@@ -6,10 +6,10 @@ class UtilLevel6:
     def __init__(self, util):
         self.util = util
         self.level_solved = False
-        
+
         self.player = Player(self, 27, 27)
         self.players = [self.player]
-        
+
         self.doors = []
 
         self.walls = []

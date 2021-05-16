@@ -23,7 +23,7 @@ class Util:
     """
     def __init__(self, is_test = False):
         pygame.init()
-        
+
         self.levels = [UtilLevel1(self), UtilLevel2(self), UtilLevel3(self), UtilLevel4(self), UtilLevel5(self), UtilLevel6(self)]
         self.level_util = self.levels[0]
         self.level_index = 0
@@ -31,17 +31,17 @@ class Util:
         self.game_state = StateType.MAIN_MENU
         self.is_test = is_test
         self.solution = None
-        
+
         self.run_game = True
         self.fps = 60
         self.clock = pygame.time.Clock()
         self.mouse_position = pygame.mouse.get_pos()
-        
+
         self.logic = GameLogic(self)
         self.event_handler = EventHandler(self)
         self.gui = GameGraphics(self)
         self.sounds = GameSounds()
-        
+
         if not is_test:
             self.run()
 
@@ -50,7 +50,7 @@ class Util:
     def run(self):
         while self.run_game:
             self.mouse_position = pygame.mouse.get_pos()
-            
+
             if self.game_state == StateType.MAIN_MENU:
                 self.execute_main_menu()
             elif self.game_state == StateType.PLAYING:
@@ -69,13 +69,13 @@ class Util:
     def execute_gameplay(self):
         self.event_handler.time_since_last_event_execute += self.clock.tick(self.fps)
         self.handle_playing_keypresses()
-        
+
         if not self.game_paused:
             self.event_handler.execute_next_method_in_event_list()
-        
+
         if self.event_handler.all_events_have_been_executed():
             self.pause_game()
-       
+
         self.gui.draw_current_level()
 
     def handle_playing_keypresses(self):
@@ -101,7 +101,7 @@ class Util:
                 self.run_game = False
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.check_if_level_button_clicked()
-                
+
     def check_if_level_button_clicked(self):
         level_1_button_center = (227, 265)
         level_2_button_center = (323, 316)
@@ -152,7 +152,7 @@ class Util:
         self.reset_game_state()
         self.gui.draw_current_level()
 
-    def get_game_state(self): 
+    def get_game_state(self):
         self.sounds.sound_on = False # hack to not hear the player moving while going thru events
         self.event_handler.execute_all_events()
         self.sounds.sound_on = True
@@ -175,7 +175,7 @@ class Util:
         self.logic.level_util = self.levels[self.level_index]
         self.game_paused = True
         self.gui.play_button = self.gui.tiles.play_icon
-        self.reset_level()    
+        self.reset_level()
 
     def distance(self, p_1, p_2):
         return math.sqrt(((p_1[0]-p_2[0])**2)+((p_1[1]-p_2[1])**2))

@@ -6,7 +6,7 @@ class ImageTiles:
         self.directory_path = os.path.dirname(os.path.realpath(__file__)).removesuffix('/utilities')
         self.__image_tiles = []
         self.__load_tile_images()
-        
+
         # all the enum_types of tiles currently used in game, to be called from elsewhere:
         self.wall_horizontal = self.__image_tiles[1]
         self.wall_horizontal_2 = self.__image_tiles[58]
@@ -38,7 +38,7 @@ class ImageTiles:
 
         self.level_backgrounds = []
         self.__load_level_backgrounds()
-    
+
     def __load_tile_images(self):
         """Ladataan kaikki pelin spritesheet grafiikat assets kansiosta image_tiles listaan ja järjestetään ne oikeaan järjestykseen.
         """
@@ -49,7 +49,7 @@ class ImageTiles:
                 new_png = pygame.image.load(path)
                 new_png.convert()
                 self.__image_tiles.append(new_png)
-    
+
     def __load_icons(self):
         asset_path = self.directory_path + "/assets/icons/"
         for filename in sorted(os.listdir(asset_path)):
@@ -58,7 +58,7 @@ class ImageTiles:
                 new_png = pygame.image.load(path)
                 new_png.convert()
                 self.__icons.append(new_png)
-    
+
     def __load_level_backgrounds(self):
         asset_path = self.directory_path + "/assets/level_backgrounds/"
         for filename in sorted(os.listdir(asset_path)):

@@ -183,7 +183,7 @@ class UtilLevel5:
 
         self.player = Player(self, 21, 22)
         self.players = [self.player]
-        
+
         self.doors = []
 
         self.walls = []
@@ -195,7 +195,7 @@ class UtilLevel5:
         self.p_4 = Pillar(11, 12)
         self.p_5 = Pillar(21, 12)
         self.p_6 = Pillar(21, 18)
-        self.pillars = [self.p_0, self.p_1, self.p_2, self.p_3, self.p_4, self.p_5, self.p_6] 
+        self.pillars = [self.p_0, self.p_1, self.p_2, self.p_3, self.p_4, self.p_5, self.p_6]
 
         self.level = Level5(self)
 
@@ -216,7 +216,7 @@ class UtilLevel5:
                 pass
 
             index += 1
-            
+
             if index == 4:
                 solution_coordinates.append((x, y))
                 index = 0
@@ -240,7 +240,7 @@ class UtilLevel5:
                     break
             if wall_in_wrong_place:
                 return False
-    
+
         return True
 
 class Level5:

@@ -1,5 +1,12 @@
 /laskarit/viikko2/unicafe/.pytest_cache
 /laskarit/viikko2/unicafe/src/__pycache__/
 /laskarit/viikko2/unicafe/src/tests/__pycache__/
-/spaghetti/.pytest_cache
-/spaghetti/src/__pycache__
+/spaghetti/.pytest_cache/
+/spaghetti/src/__pycache__/
+/spaghetti/tests/__pycache__/
+/spaghetti/levels/__pycache__/
+/spaghetti/level_solutions/__pycache__/
+/spaghetti/game_objects/__pycache__/
+/spaghetti/enum_types/__pycache__/
+/spaghetti/utilities/__pycache__/
+/spaghetti/htmlcov/

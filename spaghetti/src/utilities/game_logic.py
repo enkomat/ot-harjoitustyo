@@ -36,7 +36,7 @@ class GameLogic:
         if self.collision_in_position(player._Player__position_x, player._Player__position_y + 1):
             return
         player._Player__position_y += 1
-    
+
     def player_interact(self, player):
         """Laittaa pelaajan avaamaan oven, jos se on sen päällä. Jos pelaaja onnistuu avaamaan oven, päivitetään ovi avonaiseksi.
 
@@ -62,7 +62,7 @@ class GameLogic:
 
     def player_get_position_x(self, player):
         return player._Player__position_x
-    
+
     def player_get_position_y(self, player):
         return player._Player__position_y
 
@@ -88,7 +88,7 @@ class GameLogic:
                 self.util.sounds.play_sound(self.util.sounds.level_win)
                 self.level_util.level_solved = True
             return True
-        return False        
+        return False
 
     def collision_in_position(self, x, y):
         collidable_wall = self.get_wall_in_position(x, y)
@@ -108,10 +108,10 @@ class GameLogic:
         wall_up_right = self.get_wall_in_position(x+1, y-1)
         wall_down_left = self.get_wall_in_position(x-1, y+1)
         wall_down_right = self.get_wall_in_position(x+1, y+1)
-        
+
         if not wall_right and not wall_left and not wall_up and not wall_down:
             new_wall.type = WallType.HORIZONTAL
-        
+
         if not wall_right and not wall_left and wall_up and wall_up.type == WallType.VERTICAL_RIGHT:
             new_wall.type = WallType.VERTICAL_RIGHT
         if not wall_right and not wall_left and wall_down and wall_down.type == WallType.VERTICAL_RIGHT:
@@ -120,7 +120,7 @@ class GameLogic:
             new_wall.type = WallType.VERTICAL_LEFT
         if not wall_right and not wall_left and wall_down and wall_down.type == WallType.VERTICAL_LEFT:
             new_wall.type = WallType.VERTICAL_LEFT
-        
+
         if not wall_right and not wall_left and not wall_up and wall_down and wall_down_right:
             new_wall.type = WallType.VERTICAL_LEFT
             wall_down.type = WallType.CORNER_LOWER_LEFT
@@ -137,14 +137,14 @@ class GameLogic:
 
         if not wall_right and wall_left and wall_up:
             new_wall.type = WallType.CORNER_LOWER_RIGHT
-        
+
         if wall_down and wall_down.type == WallType.VERTICAL_LEFT:
             new_wall.type = WallType.VERTICAL_LEFT
-        
+
         if not wall_right and not wall_left and not wall_up and not wall_down_right and wall_down and wall_down_left:
             new_wall.type = WallType.VERTICAL_RIGHT
             wall_down.type = WallType.CORNER_LOWER_RIGHT
-    
+
     def get_wall_in_position(self, x, y):
         for wall in self.level_util.walls:
             if wall._Wall__position_x == x and wall._Wall__position_y == y:

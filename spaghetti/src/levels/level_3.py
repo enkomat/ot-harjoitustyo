@@ -5,7 +5,7 @@ class UtilLevel3:
     def __init__(self, util):
         self.util = util
         self.level_solved = False
-        
+
         self.p_1 = Player(self, 1, 5)
         self.p_2 = Player(self, 3, 25)
         self.p_3 = Player(self, 5, 5)
@@ -24,7 +24,7 @@ class UtilLevel3:
         self.p_16 = Player(self, 31, 25)
         self.players = [self.p_1, self.p_2, self.p_3, self.p_4, self.p_5, self.p_6, self.p_7, self.p_8,
                self.p_9, self.p_10, self.p_11, self.p_12, self.p_13, self.p_14, self.p_15, self.p_16]
-        
+
         self.g_1 = Door(1, 25)
         self.g_2 = Door(3, 5)
         self.g_3 = Door(5, 25)
