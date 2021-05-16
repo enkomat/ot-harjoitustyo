@@ -5,7 +5,7 @@ Tämän pelin idea on yhdistää Python ohjelmointia visuaalisiin puzzleihin
 
 - [Käyttöohje](./dokumentaatio/kayttoohje.md)
 - [Vaatimusmäärittely](./dokumentaatio/vaatimusmaarittely.md)
-- [Testausdokumentti](./dokumentaatio/vaatimusmaarittely.md)
+- [Testausdokumentti](./dokumentaatio/testausdokumentti.md)
 - [Arkkitehtuurikuvaus](./dokumentaatio/arkkitehtuurikuvaus.md)
 - [Työaikakirjanpito](./dokumentaatio/tyoaikakirjanpito.md)
 
@@ -156,7 +156,7 @@ Raportti generoituu _htmlcov_-hakemistoon.
 
 ### Pylint
 
-Tiedoston [.pylintrc](./.pylintrc) määrittelemät tarkistukset voi suorittaa komennolla:
+Tyylitarkistuksen voi tehdä seuravalla komennolla:
 
 ```bash
 poetry run invoke lint
