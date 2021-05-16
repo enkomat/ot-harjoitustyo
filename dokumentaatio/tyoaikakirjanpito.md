@@ -20,17 +20,17 @@
 | 27.4. | 6   | refaktorointia, testien toimimaan laittaminen, uusien testien kirjoittaminen, sekvenssikaavio |
 | 3.5. | 4   | uusien levelien luontia |
 | 4.5. | 8   | uusien levelien luontia, säätöä seiskatason kanssa. uusien testien kirjoittaminen. pariin luokkaan docstringit. |
-| 5.5. | 3   |  |
-| 6.5. | 7   |  |
-| 7.5. | 6   |  |
-| 8.5. | 5   |  |
-| 9.5. | 2   |  |
-| 10.5. | 6   |  |
-| 11.5. | 4   |  |
-| 12.5. | 4   |  |
-| 13.5. | 3   |  |
-| 14.5. | 5   |  |
-| 15.5. | 6   |  |
-| 16.5. | 6   |  |
+| 5.5. | 3   | uuden levelin testailua, pivotti rakentamiseen uutena mekaniikkana. |
+| 6.5. | 7   | koko arkkitehtuurin refaktorointia, jottei peliä tarvitse joka kerta avat uudelleen kun haluaa testata uutta koodia. |
+| 7.5. | 6   | refaktoroinnin jatkamista. |
+| 8.5. | 5   | seinänrakennus systeemin koodailua. |
+| 9.5. | 2   | seinänrakennus ja collision systeemin jatkamista. |
+| 10.5. | 6   | modulaarisempi level solved check ja rakennusmekaniikan hiomista. |
+| 11.5. | 4   | rakennuslevelien luontia ja mekaniikan hiomista. |
+| 12.5. | 4   | refaktorointia ja levelien luontia. |
+| 13.5. | 3   | refaktorointia ja levelien luontia. |
+| 14.5. | 5   | refaktorointia, main menu uusiksi |
+| 15.5. | 6   | dokumentaation tekemistä, pelin hiomista |
+| 16.5. | 6   | dokumentaation tekemistä, pelin hiomista |
 
 
