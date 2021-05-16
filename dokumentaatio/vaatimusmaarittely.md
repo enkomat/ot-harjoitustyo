@@ -6,7 +6,7 @@ Sovellus on peli nimeltä Legend of Spaghetti Master. Pelin ydinidea on puzzlepe
 
 ## Pelin toiminta
 
-Peli toimii kirjastona joka sinun pitää liittää luomaasi Python tiedostoon / tiedostoihin. Osa pulmista saattaa tarvita useampaa luokkaa, jotta pystyt suorittamaan ne toivotulla tavalla. Pelaajan pitää kutsua pelin tarjoamia metodeja oikealla tavalla ja modifioida pelin sisäisiä elementtejä (joita kutsutaan nodeiksi) Pythonin tarjoamilla tietorakenteilla.
+Peli toimii kirjastona joka sinun pitää liittää annettuihin Python tiedostoihin. Pelaajan pitää kutsua pelin tarjoamia metodeja oikealla tavalla ja modifioida pelin sisäisiä elementtejä (rakentaa seiniä seiniä pelaajien liikkumista) Pythonin tarjoamilla tietorakenteilla.
 
 Käytän [tätä](https://www.kenney.nl/assets/micro-roguelike) public domain grafiikka assettia.
 
@@ -14,16 +14,31 @@ Käytän [tätä](https://www.kenney.nl/assets/micro-roguelike) public domain gr
 
 Pelillä on vain yksi käyttäjä, eli pelaaja.
 
-## Käyttöliittymäluonnos
+## Käyttöliittymäluonnos (projektin alku)
 
 ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level1.png)
 
+## Lopullinen käyttöliittymä
+
+Peli koostuu kahdesta näkymästä, tasovalikosta ja tasonäkymästä. Tasonäkymät muuttuvat jokaisen tason mukaan, mutta perusilme on samanlainen.
+
+![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/main_menu_screenshot.png)
+
+![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/level_1_screenshot.png)
+
 ## Perusversion tarjoama toiminnallisuus
 
-* Seuraavat metodikutsut: start_game(level_name), move_up(amt), move_down(amt), move_left(amt), move_right(amt), interact(), get_position(), create_node(), remove_node(), link_nodes(node_a, node_b), cut_link(node_a, node_b), get_node(index).
-* Arvio siitä, kuinka monta kutsua pelille koodisi joutui tekemään. Tätä verrataan tavoiteaikaan.
-* Mahdollisuus aloittaa viimeksi pelatusta tasosta. Jos sinulla on tallessa viimeksi pelaaman levelin nimi. Voit syöttää tämän koodiisi kun kutsut 'start_game' metodia. (Todennäköisesti tämä jo tallessa luomassasi tiedostossa jos olet kirjoittanut koodia kyseiselle tasolle.)
+* Kuusi tasoa, joista neljä perustuu pelaajien liikuttamiseen ja kaksi vikaa lisää talojen rakentamismekaniikan.
+* Seuraavat metodikutsut: move_up(), move_down(), move_left(), move_right(), interact(), get_position_x(), get_position_y(), build_wall(), build_door()
+* Tasonäkymä josta pelaaja voi klikkaamalla hypätä pelaamaan haluamaansa tasoa.
+* Automaattinen koodinpäivitys klikatessa reset+play nappeja, jonka avulla jokaisen tason voi pelata läpi sulkematta peli-ikkunaa vaikka pelaaja tekisi useammankin koodimuutoksen pelatessaan joka tasoa.
+* Tason siirtojen pyyhkiminen painamalla reset näppäintä.
+* Play / pause ominaisuus pelatessa, joka mahdollistaa pelin pysäyttämisen.
 
 ## Jatkokehitys
 
 * Karttaeditori jonka avulla kuka tahansa voi tehdä oman pulmansa ja jakaa sen kavereille.
+* Mahdollisuus tallettaa edistystä.
+* Eri pistemääriä paremmasta versus huonommasta ratkaisusta.
+* Useampia tasoja, rutkasti enemmän haastetta myöhempiin tasoihin. Talojen ratkaiseminen mahdollistaa esim. convex hulling tyyppisten algoritmien käyttämisen ongelmanratkonnassa.
+* Raiteita joille saa liikkuvia vaunuja. Nämä voivat mennä pisteiden läpi, jotka vastavaavat funktioita koodissa. Pelaaja voi muokata näitä funktioita tai luoda täysin uusia.
