@@ -2,7 +2,7 @@
 
 ## Sovelluksen tarkoitus
 
-Sovellus on peli nimeltä Legend of Spaghetti Master. Pelin ydinidea on puzzlepeli jota voi kontrolloida pelkästään kutsuilla koodista. Tarkoitus on lähtökohtaisesti viihdyttää ja mahdollisesti opettaa jotain uutta ohjelmoinnista samalla. Peli ei todennäköisesti sovellu kenellekkään, jolla ei aikaisempaa koodauskokemusta. Eli ideana on tehdä ongelmista kohtuu kinkkisiä.
+Sovellus on peli nimeltä Spaghetti Master. Pelin ydinidea on puzzlepeli jota voi kontrolloida pelkästään kutsuilla koodista. Tarkoitus on lähtökohtaisesti viihdyttää ja mahdollisesti opettaa jotain uutta ohjelmoinnista samalla. Peli ei todennäköisesti sovellu kenellekkään, jolla ei aikaisempaa koodauskokemusta. Eli ideana on tehdä ongelmista kohtuu kinkkisiä.
 
 ## Pelin toiminta
 
