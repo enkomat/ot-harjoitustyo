@@ -4,7 +4,7 @@ from utilities.util import Util
 class TestLevels(unittest.TestCase):
     def test_solve_level_1(self):
         self.util = Util(True)
-        self.util.event_handler.event_execution_speed = 0
+        self.util.event_handler.event_execution_speed = 1
         self.util.game_paused = False
         self.load_test_events(self.util.level_index)
         self.run_test()
