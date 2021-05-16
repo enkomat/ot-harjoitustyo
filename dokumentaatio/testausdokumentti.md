@@ -8,4 +8,4 @@ Sovelluksen testikattavuus on 78% käyttöliittymä ja sen kaikki interaktiot mu
 
 ![](https://raw.githubusercontent.com/enkomat/ot-harjoitustyo/master/dokumentaatio/testikattavuus.png)
 
-Testaamatta jäivät iso osa Util luokassa sijaitsevat käyttöliittymään liittväy hiirenklikkaus interaktiot.
+Testaamatta jäivät iso osa Util luokassa sijaitsevat käyttöliittymään liittyvistä hiirenklikkaus interaktioista. Testit tällä hetkellä testaa pystyykö kunkin tason suorittaa onnistuneella ratkaisulla sekä sitä, että jääkö taso suorittamatta jos antaa puutteellisen ratkaisun.
