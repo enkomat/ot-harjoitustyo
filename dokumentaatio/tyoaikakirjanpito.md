@@ -20,4 +20,17 @@
 | 27.4. | 6   | refaktorointia, testien toimimaan laittaminen, uusien testien kirjoittaminen, sekvenssikaavio |
 | 3.5. | 4   | uusien levelien luontia |
 | 4.5. | 8   | uusien levelien luontia, säätöä seiskatason kanssa. uusien testien kirjoittaminen. pariin luokkaan docstringit. |
+| 5.5. | 3   |  |
+| 6.5. | 7   |  |
+| 7.5. | 6   |  |
+| 8.5. | 5   |  |
+| 9.5. | 2   |  |
+| 10.5. | 6   |  |
+| 11.5. | 4   |  |
+| 12.5. | 4   |  |
+| 13.5. | 3   |  |
+| 14.5. | 5   |  |
+| 15.5. | 6   |  |
+| 16.5. | 6   |  |
+
 
