@@ -17,9 +17,6 @@ from levels.level_6 import UtilLevel6
 
 class Util:
     """Hallinnoi pelin ja pelimoottorin kaikki perustoiminnallisuuksia. Jokaisen tason luokasta referoidaan tätä luokkaa perustoiminallisuuksia varten.
-
-    Attributes:
-        fps = pelin frames per second
     """
     def __init__(self, is_test = False):
         pygame.init()
@@ -47,6 +44,7 @@ class Util:
 
     # -----------------------
     # main game loop:
+
     def run(self):
         while self.run_game:
             self.mouse_position = pygame.mouse.get_pos()
