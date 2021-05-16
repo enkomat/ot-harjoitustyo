@@ -105,27 +105,27 @@ class TestLevels(unittest.TestCase):
         self.util.level_util = self.util.levels[3]
         self.util.logic.level_util = self.util.levels[3]
         from tests.level_4_test_solution import Level4TestSolution
-        self.util.gui.level_background = self.util.gui.tiles.level_backgrounds[0]
+        self.util.gui.level_background = self.util.gui.tiles.level_backgrounds[1]
         self.util.solution = Level4TestSolution(self.util.level_util.level)
 
     def load_level_4_test_events_2(self):
         self.util.level_util = self.util.levels[3]
         self.util.logic.level_util = self.util.levels[3]
         from tests.level_4_test_solution_2 import Level4TestSolution2
-        self.util.gui.level_background = self.util.gui.tiles.level_backgrounds[0]
+        self.util.gui.level_background = self.util.gui.tiles.level_backgrounds[1]
         self.util.solution = Level4TestSolution2(self.util.level_util.level)
     
     def load_level_5_test_events(self):
         self.util.level_util = self.util.levels[4]
         self.util.logic.level_util = self.util.levels[4]
         from tests.level_5_test_solution import Level5TestSolution
-        self.util.gui.level_background = self.util.gui.tiles.level_backgrounds[1]
+        self.util.gui.level_background = self.util.gui.tiles.level_backgrounds[0]
         self.util.solution = Level5TestSolution(self.util.level_util.level)
 
     def load_level_5_test_events_2(self):
         self.util.level_util = self.util.levels[4]
         self.util.logic.level_util = self.util.levels[4]
         from tests.level_5_test_solution_2 import Level5TestSolution2
-        self.util.gui.level_background = self.util.gui.tiles.level_backgrounds[1]
+        self.util.gui.level_background = self.util.gui.tiles.level_backgrounds[0]
         self.util.solution = Level5TestSolution2(self.util.level_util.level)
         
