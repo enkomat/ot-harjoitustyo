@@ -126,6 +126,30 @@ Tason tehtävä on seuraava:
 
 Huomaa, että seinien läpi ei voi kävellä!
 
+### Level 6
+
+*Huom! Tämän tason level solved tsekkaus ei vielä toimi, joten vaikka tason olisi tehnyt oikein niin ei pomppaa ilmoitusta siitä.* 
+
+Tällä tasolla pitää rakentaa talo jonka pohjapiirrustus muuttuu joka kerta kun tason aloittaa uudestaan. Muutos ei kuitenkaan ole täysin satunnainen, vaan talo on aina neliö tai suorakulmio.
+
+Tasolla on yksi pelaaja, ja sillä ovat käytettävisä seuraavat metodikutsut:
+  * move_down() - liikuttaa pelaaja yhden ruudun alaspäin
+  * move_up() - liikuttaa pelaajaa yhden ruudun ylöspäin
+  * move_left() - liikuttaa pelaajaa yhden ruudun vasemmalle
+  * move_right() - liikuttaa pelaajaa yhden ruudun oikealle 
+  * get_position_x() - palauttaa pelaajan paikan x. x on sivuttainen suunta, vasemmalta oikealle.
+  * get_position_y() - palauttaa pelaajan paikan y. y on vertikaalinen suunta, ylhäältä alas.
+  * build_wall() - rakentaa seinän siihen kohtaan missä pelaaja sillä hetkellä on.
+  * build_door() - rakentaa oven siihen kohtan missä pelaaja sillä hetkellä on.
+
+Tasolla on myös muuttja 'pillars' joka sisältää kaikki talon neljä pilaria. Voit hakea kunkin pilarin paikan seuraavien metodikutsujen avulla:
+  * get_position_x() - palauttaa pilaring paikan x. x on sivuttainen suunta, vasemmalta oikealle.
+  * get_position_y() - palauttaa pilarin paikan y. y on vertikaalinen suunta, ylhäältä alas.
+
+Tason tehtävä on seuraava:
+  * ohjaa pelaajaa merkattuja viivoja ja pilareita pitkin, rakentaen jokaisen viivan ja pilarin päälle seinät.
+  * tee algoritmista sellainen, että se pystyy ratkomaan tason vaikka pohjapiirrustus onkin erilainen joka kerta kun pelaajasi lähtee rakentamaan.
+
 ## Komentorivitoiminnot
 
 ### Pelin avaaminen
