@@ -4,181 +4,182 @@ from game_objects.pillar import Pillar
 level_solution = """
 20
 22
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 19
 22
-Wall_Type.DOOR
+WallType.DOOR
 ---------
 18
 22
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 17
 22
-Wall_Type.CORNER_LOWER_LEFT
+WallType.CORNER_LOWER_LEFT
 ---------
 17
 21
-Wall_Type.VERTICAL_LEFT
+WallType.VERTICAL_LEFT
 ---------
 17
 20
-Wall_Type.VERTICAL_LEFT
+WallType.VERTICAL_LEFT
 ---------
 17
 19
-Wall_Type.VERTICAL_LEFT
+WallType.VERTICAL_LEFT
 ---------
 17
 18
-Wall_Type.CORNER_UPPER_LEFT
+WallType.CORNER_UPPER_LEFT
 ---------
 16
 18
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 15
 18
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 14
 18
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 13
 18
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 12
 18
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 11
 18
-Wall_Type.CORNER_LOWER_LEFT
+WallType.CORNER_LOWER_LEFT
 ---------
 11
 17
-Wall_Type.VERTICAL_LEFT
+WallType.VERTICAL_LEFT
 ---------
 11
 16
-Wall_Type.VERTICAL_LEFT
+WallType.VERTICAL_LEFT
 ---------
 11
 15
-Wall_Type.VERTICAL_LEFT
+WallType.VERTICAL_LEFT
 ---------
 11
 14
-Wall_Type.VERTICAL_LEFT
+WallType.VERTICAL_LEFT
 ---------
 11
 13
-Wall_Type.VERTICAL_LEFT
+WallType.VERTICAL_LEFT
 ---------
 11
 12
-Wall_Type.CORNER_UPPER_LEFT
+WallType.CORNER_UPPER_LEFT
 ---------
 12
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 13
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 14
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 15
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 16
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 17
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 18
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 19
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 20
 12
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 21
 12
-Wall_Type.CORNER_UPPER_RIGHT
+WallType.CORNER_UPPER_RIGHT
 ---------
 21
 13
-Wall_Type.VERTICAL_RIGHT
+WallType.VERTICAL_RIGHT
 ---------
 21
 14
-Wall_Type.VERTICAL_RIGHT
+WallType.VERTICAL_RIGHT
 ---------
 21
 15
-Wall_Type.VERTICAL_RIGHT
+WallType.VERTICAL_RIGHT
 ---------
 21
 16
-Wall_Type.VERTICAL_RIGHT
+WallType.VERTICAL_RIGHT
 ---------
 21
 17
-Wall_Type.VERTICAL_RIGHT
+WallType.VERTICAL_RIGHT
 ---------
 21
 18
-Wall_Type.CORNER_UPPER_RIGHT
+WallType.CORNER_UPPER_RIGHT
 ---------
 21
 19
-Wall_Type.VERTICAL_RIGHT
+WallType.VERTICAL_RIGHT
 ---------
 21
 20
-Wall_Type.VERTICAL_RIGHT
+WallType.VERTICAL_RIGHT
 ---------
 21
 21
-Wall_Type.VERTICAL_RIGHT
+WallType.VERTICAL_RIGHT
 ---------
 21
 22
-Wall_Type.CORNER_LOWER_RIGHT
+WallType.CORNER_LOWER_RIGHT
 ---------
 20
 18
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 19
 18
-Wall_Type.DOOR
+WallType.DOOR
 ---------
 18
 18
-Wall_Type.HORIZONTAL
+WallType.HORIZONTAL
 ---------
 """
 
-class Util_Level_5:
+class UtilLevel5:
     def __init__(self, util):
         self.util = util
+        self.level_solved = False
 
         self.player = Player(self, 21, 22)
         self.players = [self.player]
@@ -187,16 +188,16 @@ class Util_Level_5:
 
         self.walls = []
 
-        self.p0 = Pillar(21, 22)
-        self.p1 = Pillar(17, 22)
-        self.p2 = Pillar(17, 18)
-        self.p3 = Pillar(11, 18)
-        self.p4 = Pillar(11, 12)
-        self.p5 = Pillar(21, 12)
-        self.p6 = Pillar(21, 18)
-        self.pillars = [self.p0, self.p1, self.p2, self.p3, self.p4, self.p5, self.p6] 
+        self.p_0 = Pillar(21, 22)
+        self.p_1 = Pillar(17, 22)
+        self.p_2 = Pillar(17, 18)
+        self.p_3 = Pillar(11, 18)
+        self.p_4 = Pillar(11, 12)
+        self.p_5 = Pillar(21, 12)
+        self.p_6 = Pillar(21, 18)
+        self.pillars = [self.p_0, self.p_1, self.p_2, self.p_3, self.p_4, self.p_5, self.p_6] 
 
-        self.level = Level_5(self)
+        self.level = Level5(self)
 
     def level_win_condition_satisfied(self):
         level_solution_list = level_solution.splitlines()
@@ -207,7 +208,6 @@ class Util_Level_5:
         solution_coordinates = []
         # check all needed walls exist
         for line in level_solution_list:
-
             if index == 1:
                 x = int(line)
             elif index == 2:
@@ -243,7 +243,7 @@ class Util_Level_5:
     
         return True
 
-class Level_5:
+class Level5:
     def __init__(self, level_util):
         self.__util_level_5 = level_util
         self.player = self.__util_level_5.player

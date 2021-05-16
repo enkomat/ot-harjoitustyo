@@ -1,9 +1,9 @@
 import pygame
 
-from utilities.image_tiles import Image_Tiles
-from enum_types.wall_type import Wall_Type
+from utilities.image_tiles import ImageTiles
+from enum_types.wall_type import WallType
 
-class Game_Graphics:
+class GameGraphics:
     def __init__(self, util):
         self.util = util
 
@@ -19,7 +19,7 @@ class Game_Graphics:
         self.font_level_solved = pygame.font.SysFont('ComicSans MS', 32)
 
         self.tile_pixel_size = 24
-        self.tiles = Image_Tiles()
+        self.tiles = ImageTiles()
         self.level_background = self.tiles.level_backgrounds[0]
         self.play_button = self.tiles.play_icon # swaps between pause and play
         
@@ -37,8 +37,6 @@ class Game_Graphics:
         self.draw_doors()
         self.draw_walls()
         self.draw_players()
-        self.draw_coords()
-        self.draw_buttons()
 
     def draw_text(self, text, x, y, color = (255, 255, 255)):
         """Piirtää tekstiä Pygamen avulla mihin tahansa peli-ikkunaan.
@@ -154,21 +152,21 @@ class Game_Graphics:
         for wall in self.util.level_util.walls:
             tile_to_draw = None
             
-            if wall.type == Wall_Type.HORIZONTAL:
+            if wall.type == WallType.HORIZONTAL:
                 tile_to_draw = self.tiles.wall_horizontal
-            elif wall.type == Wall_Type.DOOR:
+            elif wall.type == WallType.DOOR:
                 tile_to_draw = self.tiles.open_door
-            if wall.type == Wall_Type.VERTICAL_LEFT:
+            if wall.type == WallType.VERTICAL_LEFT:
                 tile_to_draw = self.tiles.wall_vertical_left
-            elif wall.type == Wall_Type.VERTICAL_RIGHT:
+            elif wall.type == WallType.VERTICAL_RIGHT:
                 tile_to_draw = self.tiles.wall_vertical_right
-            elif wall.type == Wall_Type.CORNER_LOWER_LEFT:
+            elif wall.type == WallType.CORNER_LOWER_LEFT:
                 tile_to_draw = self.tiles.wall_corner_lower_left
-            elif wall.type == Wall_Type.CORNER_UPPER_LEFT:
+            elif wall.type == WallType.CORNER_UPPER_LEFT:
                 tile_to_draw = self.tiles.wall_corner_upper_left
-            elif wall.type == Wall_Type.CORNER_LOWER_RIGHT:
+            elif wall.type == WallType.CORNER_LOWER_RIGHT:
                 tile_to_draw = self.tiles.wall_corner_lower_right
-            elif wall.type == Wall_Type.CORNER_UPPER_RIGHT:
+            elif wall.type == WallType.CORNER_UPPER_RIGHT:
                 tile_to_draw = self.tiles.wall_corner_upper_right
 
             if tile_to_draw:
@@ -176,8 +174,8 @@ class Game_Graphics:
 
     def draw_current_level(self):
         self.draw_map()
-        #self.draw_ui(self.event_execution_amount)
-        #self.draw_coords()
+        self.draw_coords()
+        self.draw_buttons()
         if self.util.logic.level_has_been_solved():
             self.draw_tile(self.tiles.level_solved, 13, 14)
         pygame.display.update()

@@ -1,7 +1,7 @@
 import pygame
 import os
 
-class Image_Tiles:
+class ImageTiles:
     def __init__(self):
         self.directory_path = os.path.dirname(os.path.realpath(__file__)).removesuffix('/utilities')
         self.__image_tiles = []

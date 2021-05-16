@@ -1,8 +1,7 @@
-import pygame
+from enum_types.wall_type import WallType
+from game_objects.wall import Wall
 
-from enum_types.wall_type import Wall_Type
-
-class Game_Logic:
+class GameLogic:
     def __init__(self, util):
         self.util = util
         self.level_util = util.level_util
@@ -50,15 +49,15 @@ class Game_Logic:
     def player_build_wall(self, player):
         if self.get_wall_in_position(player._Player__position_x,player._Player__position_y):
             return
-        self.play_sound(self.sounds.build)
+        self.util.sounds.play_sound(self.util.sounds.build)
         new_wall = Wall(player._Player__position_x, player._Player__position_y)
         self.level_util.walls.append(new_wall)
         self.set_correct_wall_type(new_wall)
 
     def player_build_door(self, player):
-        self.play_sound(self.sounds.build)
+        self.util.sounds.play_sound(self.util.sounds.build)
         new_door = Wall(player._Player__position_x, player._Player__position_y)
-        new_door.type = Wall_Type.DOOR
+        new_door.type = WallType.DOOR
         self.level_util.walls.append(new_door)
 
     def player_get_position_x(self, player):
@@ -86,15 +85,15 @@ class Game_Logic:
     def level_has_been_solved(self):
         if self.level_util.level_win_condition_satisfied():
             if self.level_util.level_solved == False:
-                self.play_sound(self.sounds.level_win)
+                self.util.sounds.play_sound(self.util.sounds.level_win)
                 self.level_util.level_solved = True
             return True
         return False        
 
     def collision_in_position(self, x, y):
         collidable_wall = self.get_wall_in_position(x, y)
-        if collidable_wall and collidable_wall.type is not Wall_Type.DOOR:
-            self.play_sound(self.sounds.hit_wall)
+        if collidable_wall and collidable_wall.type is not WallType.DOOR:
+            self.util.sounds.play_sound(self.util.sounds.hit_wall)
             return True
         return False
 
@@ -111,46 +110,42 @@ class Game_Logic:
         wall_down_right = self.get_wall_in_position(x+1, y+1)
         
         if not wall_right and not wall_left and not wall_up and not wall_down:
-            new_wall.type = Wall_Type.HORIZONTAL
+            new_wall.type = WallType.HORIZONTAL
         
-        if not wall_right and not wall_left and wall_up and wall_up.type == Wall_Type.VERTICAL_RIGHT:
-            new_wall.type = Wall_Type.VERTICAL_RIGHT
-        if not wall_right and not wall_left and wall_down and wall_down.type == Wall_Type.VERTICAL_RIGHT:
-            new_wall.type = Wall_Type.VERTICAL_RIGHT
-        if not wall_right and not wall_left and wall_up and wall_up.type == Wall_Type.VERTICAL_LEFT:
-            new_wall.type = Wall_Type.VERTICAL_LEFT
-        if not wall_right and not wall_left and wall_down and wall_down.type == Wall_Type.VERTICAL_LEFT:
-            new_wall.type = Wall_Type.VERTICAL_LEFT
+        if not wall_right and not wall_left and wall_up and wall_up.type == WallType.VERTICAL_RIGHT:
+            new_wall.type = WallType.VERTICAL_RIGHT
+        if not wall_right and not wall_left and wall_down and wall_down.type == WallType.VERTICAL_RIGHT:
+            new_wall.type = WallType.VERTICAL_RIGHT
+        if not wall_right and not wall_left and wall_up and wall_up.type == WallType.VERTICAL_LEFT:
+            new_wall.type = WallType.VERTICAL_LEFT
+        if not wall_right and not wall_left and wall_down and wall_down.type == WallType.VERTICAL_LEFT:
+            new_wall.type = WallType.VERTICAL_LEFT
         
         if not wall_right and not wall_left and not wall_up and wall_down and wall_down_right:
-            new_wall.type = Wall_Type.VERTICAL_LEFT
-            wall_down.type = Wall_Type.CORNER_LOWER_LEFT
+            new_wall.type = WallType.VERTICAL_LEFT
+            wall_down.type = WallType.CORNER_LOWER_LEFT
         if not wall_right and not wall_left and wall_up and wall_up_left:
-            new_wall.type = Wall_Type.VERTICAL_RIGHT
-            wall_up.type = Wall_Type.CORNER_UPPER_RIGHT
-        if wall_right and wall_down_right and wall_down_right.type == Wall_Type.VERTICAL_RIGHT:
-            new_wall.type = Wall_Type.HORIZONTAL
-            wall_right.type = Wall_Type.CORNER_UPPER_RIGHT
+            new_wall.type = WallType.VERTICAL_RIGHT
+            wall_up.type = WallType.CORNER_UPPER_RIGHT
+        if wall_right and wall_down_right and wall_down_right.type == WallType.VERTICAL_RIGHT:
+            new_wall.type = WallType.HORIZONTAL
+            wall_right.type = WallType.CORNER_UPPER_RIGHT
 
         if wall_left and wall_down_left:
-            new_wall.type = Wall_Type.HORIZONTAL
-            wall_left.type = Wall_Type.CORNER_UPPER_LEFT
+            new_wall.type = WallType.HORIZONTAL
+            wall_left.type = WallType.CORNER_UPPER_LEFT
 
         if not wall_right and wall_left and wall_up:
-            new_wall.type = Wall_Type.CORNER_LOWER_RIGHT
+            new_wall.type = WallType.CORNER_LOWER_RIGHT
         
-        if wall_down and wall_down.type == Wall_Type.VERTICAL_LEFT:
-            new_wall.type = Wall_Type.VERTICAL_LEFT
+        if wall_down and wall_down.type == WallType.VERTICAL_LEFT:
+            new_wall.type = WallType.VERTICAL_LEFT
         
         if not wall_right and not wall_left and not wall_up and not wall_down_right and wall_down and wall_down_left:
-            new_wall.type = Wall_Type.VERTICAL_RIGHT
-            wall_down.type = Wall_Type.CORNER_LOWER_RIGHT
+            new_wall.type = WallType.VERTICAL_RIGHT
+            wall_down.type = WallType.CORNER_LOWER_RIGHT
     
     def get_wall_in_position(self, x, y):
         for wall in self.level_util.walls:
             if wall._Wall__position_x == x and wall._Wall__position_y == y:
                 return wall
-
-    def play_sound(self, sound):
-        if self.util.sounds.sound_on:
-            pygame.mixer.Sound.play(sound)

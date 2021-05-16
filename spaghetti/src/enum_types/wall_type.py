@@ -1,6 +1,6 @@
 from enum import Enum
 
-class Wall_Type(Enum):
+class WallType(Enum):
     HORIZONTAL = 1
     VERTICAL_RIGHT = 2
     VERTICAL_LEFT = 3

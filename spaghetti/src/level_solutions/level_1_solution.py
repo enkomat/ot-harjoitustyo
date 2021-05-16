@@ -1,10 +1,6 @@
-from levels.level_1 import Level_1
+from levels.level_1 import Level1
 
-class Level_1_Solution:
-    def __init__(self, level: Level_1):
-        level.player.move_right()
-        level.player.move_right()
-        level.player.move_right()
-        level.player.move_right()
-        level.player.move_right()
-        level.player.move_right()
+class Level1Solution:
+    def __init__(self, level: Level1):
+        # write your code here and remove the pass statement!
+        pass

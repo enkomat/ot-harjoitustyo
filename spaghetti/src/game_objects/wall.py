@@ -1,7 +1,7 @@
-from enum_types.wall_type import Wall_Type
+from enum_types.wall_type import WallType
 
 class Wall:
-    def __init__(self, position_x, position_y, wall_type = Wall_Type.HORIZONTAL):
+    def __init__(self, position_x, position_y, wall_type = WallType.HORIZONTAL):
         self.__position_x = position_x
         self.__position_y = position_y
         self.type = wall_type

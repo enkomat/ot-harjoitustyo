@@ -1,5 +1,6 @@
-from levels.level_5 import Level_5
+from levels.level_5 import Level5
 
-class Level_5_Solution:
-    def __init__(self, level: Level_5):
+class Level5Solution:
+    def __init__(self, level: Level5):
+        # write your code here and remove the pass statement below!
         pass

@@ -1,7 +1,7 @@
 import pygame
 import os
 
-class Game_Sounds:
+class GameSounds:
     def __init__(self):
         self.__sounds = []
         self.__load_game_sounds()
@@ -17,3 +17,7 @@ class Game_Sounds:
             if 'ogg' in path:
                 new_sound = pygame.mixer.Sound(path)
                 self.__sounds.append(new_sound)
+
+    def play_sound(self, sound):
+        if self.sound_on:
+            pygame.mixer.Sound.play(sound)

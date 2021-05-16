@@ -2,9 +2,10 @@ import random
 from game_objects.player import Player
 from game_objects.pillar import Pillar
 
-class Util_Level_6:
+class UtilLevel6:
     def __init__(self, util):
         self.util = util
+        self.level_solved = False
         
         self.player = Player(self, 27, 27)
         self.players = [self.player]
@@ -16,7 +17,7 @@ class Util_Level_6:
         self.pillars = []
         self.randomize_pillars()
 
-        self.level = Level_6(self)
+        self.level = Level6(self)
 
     def randomize_pillars(self):
         self.pillars.clear()
@@ -25,13 +26,16 @@ class Util_Level_6:
         random_y_top = random.randint(10, 15)
         random_y_bottom = random.randint(17, 25)
 
-        self.p0 = Pillar(random_x_right, random_y_bottom)
-        self.p1 = Pillar(random_x_left, random_y_bottom)
-        self.p2 = Pillar(random_x_left, random_y_top)
-        self.p3 = Pillar(random_x_right, random_y_top)
-        self.pillars = [self.p0, self.p1, self.p2, self.p3]
+        self.p_0 = Pillar(random_x_right, random_y_bottom)
+        self.p_1 = Pillar(random_x_left, random_y_bottom)
+        self.p_2 = Pillar(random_x_left, random_y_top)
+        self.p_3 = Pillar(random_x_right, random_y_top)
+        self.pillars = [self.p_0, self.p_1, self.p_2, self.p_3]
 
-class Level_6:
+    def level_win_condition_satisfied(self):
+        return False
+
+class Level6:
     def __init__(self, level_util):
         self.__util_level_6 = level_util
         self.player = self.__util_level_6.player

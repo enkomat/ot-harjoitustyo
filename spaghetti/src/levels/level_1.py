@@ -1,7 +1,7 @@
 from game_objects.player import Player
 from game_objects.door import Door
 
-class Util_Level_1:
+class UtilLevel1:
     """Pelin ensimmäisen tason työkalupakettiluokka.
 
     Attributes:
@@ -24,12 +24,12 @@ class Util_Level_1:
 
         self.pillars = [] 
 
-        self.level = Level_1(self)
+        self.level = Level1(self)
 
     def level_win_condition_satisfied(self):
         return self.player._Player__position_x == self.doors[0]._Door__position_x and self.player._Player__position_y == self.doors[0]._Door__position_y and self.player._Player__has_interacted
 
-class Level_1:
+class Level1:
     """Pelaajalle avoinna oleva luokka jonka kautta kutsutaan tason ratkaisemiseen tarkoitettuja metodeja.
     """
     def __init__(self, level_util):
