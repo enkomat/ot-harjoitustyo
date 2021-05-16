@@ -31,6 +31,6 @@
 | 13.5. | 3   | refaktorointia ja levelien luontia. |
 | 14.5. | 5   | refaktorointia, main menu uusiksi |
 | 15.5. | 6   | dokumentaation tekemistä, pelin hiomista |
-| 16.5. | 6   | dokumentaation tekemistä, pelin hiomista |
+| 16.5. | 6   | dokumentaation tekemistä, testit kondikseen |
 
 
