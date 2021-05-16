@@ -1,9 +1,12 @@
 import pygame
 import os
+import re
 
 class ImageTiles:
     def __init__(self):
-        self.directory_path = os.path.dirname(os.path.realpath(__file__)).removesuffix('/utilities')
+        
+        directory = os.path.dirname(os.path.realpath(__file__))
+        self.directory_path = re.sub('/utilities', '', directory)
         self.__image_tiles = []
         self.__load_tile_images()
 
