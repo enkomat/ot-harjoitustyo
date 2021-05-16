@@ -1,14 +1,33 @@
 # Spaghetti Master
-Tämän pelin idea on yhdistää Python ohjelmointia visuaalisiin puzzleihin.
-
-## Pelaaminen
-Pelin ensimmäistä tasoa voi pelata muokkaamalla 'level_1.py" tiedoston koodia. Ideana on liikuttaa hahmoa oikealla tavalla. Pelin voi avata komennolla 'poetry run invoke start'.
+Tämän pelin idea on yhdistää Python ohjelmointia visuaalisiin puzzleihin
 
 ## Dokumentaatio
 
+- [Käyttöohje](./dokumentaatio/kayttoohje.md)
 - [Vaatimusmäärittely](./dokumentaatio/vaatimusmaarittely.md)
-- [Työaikakirjanpito](./dokumentaatio/tyoaikakirjanpito.md)
+- [Testausdokumentti](./dokumentaatio/vaatimusmaarittely.md)
 - [Arkkitehtuurikuvaus](./dokumentaatio/arkkitehtuurikuvaus.md)
+- [Työaikakirjanpito](./dokumentaatio/tyoaikakirjanpito.md)
+
+## Asennus
+
+1. Asenna riippuvuudet komennolla:
+
+```bash
+poetry install
+```
+
+2. Suorita vaadittavat alustustoimenpiteet komennolla:
+
+```bash
+poetry run invoke build
+```
+
+3. Käynnistä peli komennolla:
+
+```bash
+poetry run invoke start
+```
 
 ## Pelin pelaaminen
 
@@ -107,22 +126,38 @@ Tason tehtävä on seuraava:
 
 Huomaa, että seinien läpi ei voi kävellä!
 
-## Testaus
+## Komentorivitoiminnot
 
-Testit voi suorittaa seuraavalla kutsulla:
+### Pelin avaaminen
+
+Pelin pystyy avaamaan komennolla:
+
+```bash
+poetry run invoke start
+```
+
+### Testaus
+
+Testit suoritetaan komennolla:
 
 ```bash
 poetry run invoke test
 ```
 
-Coverage sovelluksen voi suorittaa seuraavalla komennolla:
+### Testikattavuus
 
-```bash
-poetry run invoke coverage
-```
-
-Coverage raportin voi luoda seuraavalla komennolla:
+Testikattavuusraportin voi generoida komennolla:
 
 ```bash
 poetry run invoke coveragereport
+```
+
+Raportti generoituu _htmlcov_-hakemistoon.
+
+### Pylint
+
+Tiedoston [.pylintrc](./.pylintrc) määrittelemät tarkistukset voi suorittaa komennolla:
+
+```bash
+poetry run invoke lint
 ```
