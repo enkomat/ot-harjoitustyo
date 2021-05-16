@@ -63,10 +63,11 @@ class ImageTiles:
                 self.__icons.append(new_png)
 
     def __load_level_backgrounds(self):
-        asset_path = self.directory_path + "/assets/level_backgrounds/"
-        for filename in sorted(os.listdir(asset_path)):
-            path = asset_path + filename
-            if 'png' in path:
-                new_png = pygame.image.load(path)
-                new_png.convert()
-                self.level_backgrounds.append(new_png)
+        asset_paths = []
+        asset_paths.append(self.directory_path + "/assets/level_backgrounds/Level_1.png")
+        asset_paths.append(self.directory_path + "/assets/level_backgrounds/Level_2.png")
+        asset_paths.append(self.directory_path + "/assets/level_backgrounds/Level_3.png")
+        for path in asset_paths:
+            new_png = pygame.image.load(path)
+            new_png.convert()
+            self.level_backgrounds.append(new_png)
